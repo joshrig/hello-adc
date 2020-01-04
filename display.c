@@ -14,7 +14,7 @@ typedef struct
     uint8_t framebuf[512];
 
     struct spi_m_async_descriptor *spi;
-    struct io_descriptor         *io;
+    struct io_descriptor          *io;
 
     // various gpio control pins
     uint32_t reset_line;
@@ -47,9 +47,9 @@ static void xfer_cb(const struct spi_m_async_descriptor *const io)
 void display_init
 (
     struct spi_m_async_descriptor *spi,
-    uint32_t                      reset_gpio,
-    uint32_t                      data_cmd_sel_gpio,
-    uint32_t                      slave_sel_gpio
+    uint32_t                       reset_gpio,
+    uint32_t                       data_cmd_sel_gpio,
+    uint32_t                       slave_sel_gpio
 )
 {
     display_state_t *me = &display_state;
@@ -63,7 +63,7 @@ void display_init
     // register a callback when the transfer is complete
     spi_m_async_register_callback(spi, SPI_M_ASYNC_CB_XFER, (FUNC_PTR)xfer_cb);
 
-    // enable SPI in synchronous mode
+    // enable SPI in asynchronous mode
     spi_m_async_enable(spi);
 
 
@@ -128,10 +128,19 @@ void display_clear(void)
     display_state_t *me = &display_state;
 
 
-    memset(me->framebuf, 0, sizeof(me->framebuf));
+    display_clear_framebuffer();
 
-    // gpio_set_pin_level(me->data_cmd_sel_line, DATA);
-    // io_write(me->io, me->framebuf, sizeof(me->framebuf));
+    gpio_set_pin_level(me->data_cmd_sel_line, DATA);
+    io_write(me->io, me->framebuf, sizeof(me->framebuf));
+}
+
+
+void display_clear_framebuffer(void)
+{
+    display_state_t *me = &display_state;
+
+
+    memset(me->framebuf, 0, sizeof(me->framebuf));
 }
 
 

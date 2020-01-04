@@ -28,3 +28,17 @@ die and display the temps on the OLED display.
 
 - The display code for the OLED is utter garbage. It effectively
   turns the bit-addressable display into a 16x2 display.
+
+To build and flash the application:
+
+% make -f gcc/Makefile && edbg -b -t same54 -pv -f AtmelStart.bin
+
+
+EDBG can be found here:
+
+[EDBG](https://github.com/ataradov/edbg)
+
+I'm using macOS 10.15 and MacPorts, so I installed the arm-none-eabi
+toolchain from there:
+
+% sudo port install arm-none-eabi-binutils arm-none-eabi-gcc arm-none-eabi-gdb
