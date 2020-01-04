@@ -1,5 +1,5 @@
 /*
-  Basic synchronous driver code for Atmel's OLED Xplained module.
+  Basic asynchronous driver code for Atmel's OLED Xplained module.
  */
 #include <string.h>
 
@@ -13,7 +13,7 @@ typedef struct
 {
     uint8_t framebuf[512];
 
-    struct spi_m_sync_descriptor *spi;
+    struct spi_m_async_descriptor *spi;
     struct io_descriptor         *io;
 
     // various gpio control pins
@@ -38,9 +38,15 @@ static display_state_t display_state;
 
 
 
+static void xfer_cb(const struct spi_m_async_descriptor *const io)
+{
+    // nop
+}
+
+
 void display_init
 (
-    struct spi_m_sync_descriptor *spi,
+    struct spi_m_async_descriptor *spi,
     uint32_t                      reset_gpio,
     uint32_t                      data_cmd_sel_gpio,
     uint32_t                      slave_sel_gpio
@@ -51,11 +57,14 @@ void display_init
     struct io_descriptor *io;
 
     
-    // enable SPI in synchronous mode
-    spi_m_sync_enable(spi);
-
     // grab the io descriptor
-    spi_m_sync_get_io_descriptor(spi, &io);
+    spi_m_async_get_io_descriptor(spi, &io);
+
+    // register a callback when the transfer is complete
+    spi_m_async_register_callback(spi, SPI_M_ASYNC_CB_XFER, (FUNC_PTR)xfer_cb);
+
+    // enable SPI in synchronous mode
+    spi_m_async_enable(spi);
 
 
     me->spi               = spi;
