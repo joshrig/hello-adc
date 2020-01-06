@@ -1,0 +1,22 @@
+* Temperature sensor configuration (page 1619)
+  - device has 2 sensors
+    - TSENSP
+    - TSENSC
+  - controlled by SUPC
+  - you'll need the coefficients from calibration NVM
+  - how to select the temperature sensor
+    - if SUPC.VREF.ONDEMAND = 0 && SUPC.VREF.TSEN = 1 && SUPC.VREF.VREFOE = 0
+      - then the sensor is selected by writing to SUPC.VREF.TSSEL
+      - the mux input selection bits don't matter, other than at least
+        one being enabled, (I assume?)
+      - VREFOE must be OFF in this configuration
+    - if SUPC.VREF.ONDEMAND = 1 && SPUC.VREF.TSEN = 1
+      - then the sensor is selected by the ADC's mux bits
+        - 0x1B Bandgap reference (whose voltage is selected in SUPC)
+        - 0x1C PTAT
+        - 0x1D CTAT
+      - VREFOE can be ON and selected in this configuration.
+  - XXX what does the datasheet mean when it says that if you select
+    the temperature sensors or the interal reference channels then the
+    Sampling Time Length bit group in the Sampling Control register
+    must be written with a corresponding value? (page 1638)
