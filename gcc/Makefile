@@ -84,7 +84,8 @@ hal/src/hal_atomic.o \
 hpl/adc/hpl_adc.o \
 src/display.o \
 src/main.o \
-src/led.o
+src/led.o \
+src/uart.o
 
 OBJS_AS_ARGS +=  \
 "hal/src/hal_io.o" \
@@ -121,7 +122,8 @@ OBJS_AS_ARGS +=  \
 "hpl/adc/hpl_adc.o" \
 "src/display.o" \
 "src/main.o" \
-"src/led.o"
+"src/led.o" \
+"src/uart.o"
 
 # List the directories containing header files
 DIR_INCLUDES +=  \
@@ -185,7 +187,8 @@ DEPS_AS_ARGS +=  \
 "atmel_start.d" \
 "src/display.d" \
 "src/main.d" \
-"src/led.d"
+"src/led.d" \
+"src/uart.d"
 
 OUTPUT_FILE_NAME :=AtmelStart
 QUOTE := "

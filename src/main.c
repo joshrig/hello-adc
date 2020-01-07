@@ -4,8 +4,9 @@
 
 #include <atmel_start.h>
 
-#include "led.h"
 #include "display.h"
+#include "led.h"
+#include "uart.h"
 
 
 static uint8_t Muxes[] = { 0x1B, 0x1C, 0x1D  };
@@ -17,12 +18,17 @@ static double   Vref = 0.0;
 static double   Temp = 0.0;
 
 
-static double TL;
-static double TH;
+static uint16_t TLI;
+static uint16_t TLD;
+static uint16_t THI;
+static uint16_t THD;
+static double   TL;
+static double   TH;
 static uint16_t VPL;
 static uint16_t VPH;
 static uint16_t VCL;
 static uint16_t VCH;
+
 
 
 static void convert_cb_ADC_0
@@ -60,13 +66,19 @@ static void convert_cb_ADC_0
 }
 
 
+
 int main(void)
 {
     /* Initializes MCU, drivers and middleware */
     atmel_start_init();
 
+    // initialize the UART
+    uart_init();
+    uart_write("initialized UART\r\n");
+
     // initialize the LEDs
     led_init();
+    uart_write("initialized LEDs\r\n");
 
     // configure the display
     display_init(
@@ -75,9 +87,30 @@ int main(void)
         GPIO(GPIO_PORTC,  1), // data/command select
         GPIO(GPIO_PORTC, 14)  // spi slave select
         );
+    uart_write("initialized OLED display\r\n");
 
     display_clear();
 
+
+    //
+    // configure the SUPC
+    //
+    uart_write("configuring SUPC: ");
+
+    // enable on-demand mode
+    hri_supc_set_VREF_ONDEMAND_bit(SUPC);
+    uart_write("ONDEMAND ");
+
+    // enable the temperature sensors
+    hri_supc_set_VREF_TSEN_bit(SUPC);
+    uart_write("TSENS ");
+
+    // enable the voltage referance
+    hri_supc_set_VREF_VREFOE_bit(SUPC);
+    uart_write("VREF ");
+
+    uart_write("done.\r\n");
+        
 
     //
     // grab the temperature calibration parameters
@@ -85,10 +118,10 @@ int main(void)
     
     uint8_t *p = ((uint8_t *)NVMCTRL_TEMP_LOG);
 
-    uint16_t TLI = p[0];
-    uint16_t TLD = p[1] >> 4;
-    uint16_t THI = (p[1] & 0xF) << 4 | (p[2] >> 4);
-    uint16_t THD = p[2] & 0xF;
+    TLI = p[0];
+    TLD = p[1] >> 4;
+    THI = (p[1] & 0xF) << 4 | (p[2] >> 4);
+    THD = p[2] & 0xF;
 
     TL = (double)TLI + (double)TLD / 16.0;
     TH = (double)THI + (double)THD / 16.0;
@@ -98,21 +131,9 @@ int main(void)
     VCL = p[8] << 4 | (p[9] >> 4);
     VCH = p[9] << 8 | p[10];
 
+    uart_write("grab TSENS calibration params.\r\n");
 
-    //
-    // configure the SUPC
-    //
-
-    // enable on-demand mode
-    hri_supc_set_VREF_ONDEMAND_bit(SUPC);
-
-    // enable the temperature sensors
-    hri_supc_set_VREF_TSEN_bit(SUPC);
-
-    // enable the voltage referance
-    hri_supc_set_VREF_VREFOE_bit(SUPC);
-
-
+    
     //
     // grab the ADC calibration parameters
     //
@@ -126,10 +147,12 @@ int main(void)
     hri_adc_write_CALIB_BIASREFBUF_bf(ADC0, biasrefbuf);
     hri_adc_write_CALIB_BIASR2R_bf(ADC0, biasr2r);
 
+    uart_write("grab ADC calibration params.\r\n");
 
     //
     // configure the ADC
     //
+    uart_write("configuring ADC: ");
     
     // set the muxbits POSMUX - PTAT, NEGMUX - GND, channel 0
     adc_async_set_inputs(&ADC_0, Muxes[CurrentMUX], 0x18, 0);
@@ -143,10 +166,21 @@ int main(void)
     // register the callbacks when we have some samples to read
     adc_async_register_callback(&ADC_0, 0, ADC_ASYNC_CONVERT_CB, convert_cb_ADC_0);
 
+    uart_write("done.\r\n");
+
 
     
     SysTick_Config(4800000);
+    uart_write("enabled SysTick: 4800000\r\n");
 
+
+    uart_write("system up.\r\n");
+
+
+
+    char strbuf2[500];
+    sprintf(strbuf2, "TLI: %d, TLD: %d\r\nTHI: %d, THD: %d\r\n for TL: %0.2f TH: %0.2f\r\nVPL: %d, VPH: %d, VCL: %d, VCH: %d\r\n\r\n\r\n", TLI, TLD, THI, THD, TL, TH, VPL, VPH, VCL, VCH);
+    uart_write(strbuf2);
 
 
     // wait for an interrupt.
@@ -163,8 +197,10 @@ void SysTick_Handler(void)
 {
     char strbuf[50];
 
-
+    
     led_update();
+
+
 
 
     sprintf(strbuf, "VREF: %0.2fV\nTEMP: %0.2fF", Vref, Temp);
@@ -172,11 +208,9 @@ void SysTick_Handler(void)
     display_clear_framebuffer();
     display_write_string((const char *)strbuf, 1, 1);
 
-#if 1
     CurrentMUX++;
     if (CurrentMUX == 3)
         CurrentMUX = 0;
 
     adc_async_set_inputs(&ADC_0, Muxes[CurrentMUX], 0x18, 0);
-#endif
 }
