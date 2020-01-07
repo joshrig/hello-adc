@@ -14,6 +14,8 @@ extern "C" {
 
 void ADC_0_example(void);
 
+void USART_0_example(void);
+
 void SPI_0_example(void);
 
 #ifdef __cplusplus

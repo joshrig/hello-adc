@@ -67,6 +67,7 @@ main.o \
 hpl/osc32kctrl/hpl_osc32kctrl.o \
 examples/driver_examples.o \
 driver_init.o \
+hal/src/hal_usart_async.o \
 hpl/sercom/hpl_sercom.o \
 hal/utils/src/utils_ringbuffer.o \
 hal/src/hal_gpio.o \
@@ -100,6 +101,7 @@ OBJS_AS_ARGS +=  \
 "hpl/osc32kctrl/hpl_osc32kctrl.o" \
 "examples/driver_examples.o" \
 "driver_init.o" \
+"hal/src/hal_usart_async.o" \
 "hpl/sercom/hpl_sercom.o" \
 "hal/utils/src/utils_ringbuffer.o" \
 "hal/src/hal_gpio.o" \
@@ -134,6 +136,7 @@ DEPS_AS_ARGS +=  \
 "hal/src/hal_spi_m_async.d" \
 "hpl/mclk/hpl_mclk.d" \
 "driver_init.d" \
+"hal/src/hal_usart_async.d" \
 "hpl/osc32kctrl/hpl_osc32kctrl.d" \
 "main.d" \
 "examples/driver_examples.d" \

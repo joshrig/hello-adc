@@ -105,7 +105,7 @@
 // <e> Channel 0 settings
 // <id> dmac_channel_0_settings
 #ifndef CONF_DMAC_CHANNEL_0_SETTINGS
-#define CONF_DMAC_CHANNEL_0_SETTINGS 1
+#define CONF_DMAC_CHANNEL_0_SETTINGS 0
 #endif
 
 // <q> Channel Run in Standby

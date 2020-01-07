@@ -45,7 +45,8 @@ hpl/oscctrl \
 hpl/sercom \
 gcc/gcc \
 hpl/core \
-hpl/cmcc
+hpl/cmcc \
+src
 
 # List the object files
 OBJS +=  \
@@ -67,10 +68,10 @@ hpl/mclk/hpl_mclk.o \
 hpl/ramecc/hpl_ramecc.o \
 hal/src/hal_spi_m_async.o \
 gcc/gcc/startup_same54.o \
-main.o \
 hpl/osc32kctrl/hpl_osc32kctrl.o \
 examples/driver_examples.o \
 driver_init.o \
+hal/src/hal_usart_async.o \
 hpl/sercom/hpl_sercom.o \
 hal/utils/src/utils_ringbuffer.o \
 hal/src/hal_gpio.o \
@@ -81,8 +82,9 @@ hpl/cmcc/hpl_cmcc.o \
 atmel_start.o \
 hal/src/hal_atomic.o \
 hpl/adc/hpl_adc.o \
-display.o \
-led.o
+src/display.o \
+src/main.o \
+src/led.o
 
 OBJS_AS_ARGS +=  \
 "hal/src/hal_io.o" \
@@ -103,10 +105,10 @@ OBJS_AS_ARGS +=  \
 "hpl/ramecc/hpl_ramecc.o" \
 "hal/src/hal_spi_m_async.o" \
 "gcc/gcc/startup_same54.o" \
-"main.o" \
 "hpl/osc32kctrl/hpl_osc32kctrl.o" \
 "examples/driver_examples.o" \
 "driver_init.o" \
+"hal/src/hal_usart_async.o" \
 "hpl/sercom/hpl_sercom.o" \
 "hal/utils/src/utils_ringbuffer.o" \
 "hal/src/hal_gpio.o" \
@@ -117,8 +119,9 @@ OBJS_AS_ARGS +=  \
 "atmel_start.o" \
 "hal/src/hal_atomic.o" \
 "hpl/adc/hpl_adc.o" \
-"display.o" \
-"led.o"
+"src/display.o" \
+"src/main.o" \
+"src/led.o"
 
 # List the directories containing header files
 DIR_INCLUDES +=  \
@@ -167,8 +170,8 @@ DEPS_AS_ARGS +=  \
 "hal/src/hal_spi_m_async.d" \
 "hpl/mclk/hpl_mclk.d" \
 "driver_init.d" \
+"hal/src/hal_usart_async.d" \
 "hpl/osc32kctrl/hpl_osc32kctrl.d" \
-"main.d" \
 "examples/driver_examples.d" \
 "hal/src/hal_cache.d" \
 "hal/src/hal_sleep.d" \
@@ -180,8 +183,9 @@ DEPS_AS_ARGS +=  \
 "hpl/adc/hpl_adc.d" \
 "gcc/system_same54.d" \
 "atmel_start.d" \
-"display.d" \
-"led.d"
+"src/display.d" \
+"src/main.d" \
+"src/led.d"
 
 OUTPUT_FILE_NAME :=AtmelStart
 QUOTE := "

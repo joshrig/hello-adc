@@ -44,6 +44,7 @@
       <files>
         <file category="doc" condition="ARMCC, GCC, IAR" name="hal/documentation/adc_async.rst"/>
         <file category="doc" condition="ARMCC, GCC, IAR" name="hal/documentation/spi_master_async.rst"/>
+        <file category="doc" condition="ARMCC, GCC, IAR" name="hal/documentation/usart_async.rst"/>
         <file category="header" condition="ARMCC, GCC, IAR" name="hal/include/hal_atomic.h"/>
         <file category="header" condition="ARMCC, GCC, IAR" name="hal/include/hal_cache.h"/>
         <file category="header" condition="ARMCC, GCC, IAR" name="hal/include/hal_delay.h"/>
@@ -139,6 +140,7 @@
         <file category="header" condition="ARMCC, GCC, IAR" name="examples/driver_examples.h"/>
         <file category="source" condition="ARMCC, GCC, IAR" name="examples/driver_examples.c"/>
         <file category="header" condition="ARMCC, GCC, IAR" name="hal/include/hal_adc_async.h"/>
+        <file category="header" condition="ARMCC, GCC, IAR" name="hal/include/hal_usart_async.h"/>
         <file category="header" condition="ARMCC, GCC, IAR" name="hal/include/hpl_adc_async.h"/>
         <file category="header" condition="ARMCC, GCC, IAR" name="hal/include/hpl_adc_sync.h"/>
         <file category="header" condition="ARMCC, GCC, IAR" name="hal/include/hpl_missing_features.h"/>
@@ -152,6 +154,7 @@
         <file category="header" condition="ARMCC, GCC, IAR" name="hal/include/hpl_usart_sync.h"/>
         <file category="source" condition="ARMCC, GCC, IAR" name="hal/src/hal_adc_async.c"/>
         <file category="source" condition="ARMCC, GCC, IAR" name="hal/src/hal_spi_m_async.c"/>
+        <file category="source" condition="ARMCC, GCC, IAR" name="hal/src/hal_usart_async.c"/>
         <file category="header" condition="ARMCC, GCC, IAR" name="hal/utils/include/parts.h"/>
         <file category="source" condition="ARMCC, GCC, IAR" name="hpl/adc/hpl_adc.c"/>
         <file category="header" condition="ARMCC, GCC, IAR" name="hpl/adc/hpl_adc_base.h"/>

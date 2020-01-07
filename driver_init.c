@@ -22,11 +22,16 @@
 /* The maximal channel number of enabled channels */
 #define ADC_0_CH_MAX 0
 
+/*! The buffer size for USART */
+#define USART_0_BUFFER_SIZE 16
+
 struct adc_async_descriptor         ADC_0;
 struct adc_async_channel_descriptor ADC_0_ch[ADC_0_CH_AMOUNT];
+struct usart_async_descriptor       USART_0;
 
 static uint8_t ADC_0_buffer[ADC_0_BUFFER_SIZE];
 static uint8_t ADC_0_map[ADC_0_CH_MAX + 1];
+static uint8_t USART_0_buffer[USART_0_BUFFER_SIZE];
 
 struct spi_m_async_descriptor SPI_0;
 
@@ -41,6 +46,45 @@ void ADC_0_init(void)
 	hri_gclk_write_PCHCTRL_reg(GCLK, ADC0_GCLK_ID, CONF_GCLK_ADC0_SRC | (1 << GCLK_PCHCTRL_CHEN_Pos));
 	adc_async_init(&ADC_0, ADC0, ADC_0_map, ADC_0_CH_MAX, ADC_0_CH_AMOUNT, &ADC_0_ch[0], (void *)NULL);
 	adc_async_register_channel_buffer(&ADC_0, 0, ADC_0_buffer, ADC_0_BUFFER_SIZE);
+}
+
+/**
+ * \brief USART Clock initialization function
+ *
+ * Enables register interface and peripheral clock
+ */
+void USART_0_CLOCK_init()
+{
+
+	hri_gclk_write_PCHCTRL_reg(GCLK, SERCOM2_GCLK_ID_CORE, CONF_GCLK_SERCOM2_CORE_SRC | (1 << GCLK_PCHCTRL_CHEN_Pos));
+	hri_gclk_write_PCHCTRL_reg(GCLK, SERCOM2_GCLK_ID_SLOW, CONF_GCLK_SERCOM2_SLOW_SRC | (1 << GCLK_PCHCTRL_CHEN_Pos));
+
+	hri_mclk_set_APBBMASK_SERCOM2_bit(MCLK);
+}
+
+/**
+ * \brief USART pinmux initialization function
+ *
+ * Set each required pin to USART functionality
+ */
+void USART_0_PORT_init()
+{
+
+	gpio_set_pin_function(PB25, PINMUX_PB25D_SERCOM2_PAD0);
+
+	gpio_set_pin_function(PB24, PINMUX_PB24D_SERCOM2_PAD1);
+}
+
+/**
+ * \brief USART initialization function
+ *
+ * Enables USART peripheral, clocks and initializes USART driver
+ */
+void USART_0_init(void)
+{
+	USART_0_CLOCK_init();
+	usart_async_init(&USART_0, SERCOM2, USART_0_buffer, USART_0_BUFFER_SIZE, (void *)NULL);
+	USART_0_PORT_init();
 }
 
 void SPI_0_PORT_init(void)
@@ -104,6 +148,8 @@ void system_init(void)
 	init_mcu();
 
 	ADC_0_init();
+
+	USART_0_init();
 
 	SPI_0_init();
 }
