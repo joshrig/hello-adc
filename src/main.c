@@ -115,33 +115,36 @@ int main(void)
     //
     // grab the temperature calibration parameters
     //
-    
-    uint8_t *p = ((uint8_t *)NVMCTRL_TEMP_LOG);
 
-    TLI = p[0];
-    TLD = p[1] >> 4;
-    THI = (p[1] & 0xF) << 4 | (p[2] >> 4);
-    THD = p[2] & 0xF;
+    uart_write("grab TSENS calibration params.\r\n");
+
+    uint32_t *p = ((uint32_t *)NVMCTRL_TEMP_LOG);
+
+    TLI = (*p >> 0 ) & 0xFF;
+    TLD = (*p >> 8 ) & 0xF;
+    THI = (*p >> 12) & 0xFF;
+    THD = (*p >> 16) & 0xF;
 
     TL = (double)TLI + (double)TLD / 16.0;
     TH = (double)THI + (double)THD / 16.0;
 
-    VPL = p[5] << 4 | (p[6] >> 4);
-    VPH = p[6] << 8 | p[7];
-    VCL = p[8] << 4 | (p[9] >> 4);
-    VCH = p[9] << 8 | p[10];
+    p += 1;
+    VPL = (*p >> 8 ) & 0xFFF;
+    VPH = (*p >> 20) & 0xFFF;
 
-    uart_write("grab TSENS calibration params.\r\n");
+    p += 1;
+    VCL = (*p >> 0 ) & 0xFFF;
+    VCH = (*p >> 12) & 0xFFF;
 
     
     //
     // grab the ADC calibration parameters
     //
 
-    p = ((uint8_t *)0x00800080);
-    uint8_t biascomp   = (p[0] >> 2) & 0x7;
-    uint8_t biasrefbuf = (p[0] >> 5) & 0x7;
-    uint8_t biasr2r    =  p[1] & 0x7;
+    p = ((uint32_t *)0x00800080);
+    uint8_t biascomp   = (*p >> 2) & 0x7;
+    uint8_t biasrefbuf = (*p >> 5) & 0x7;
+    uint8_t biasr2r    = (*p >> 8) & 0x7;
     
     hri_adc_write_CALIB_BIASCOMP_bf(ADC0, biascomp);
     hri_adc_write_CALIB_BIASREFBUF_bf(ADC0, biasrefbuf);
@@ -203,7 +206,7 @@ void SysTick_Handler(void)
 
 
 
-    sprintf(strbuf, "VREF: %0.2fV\nTEMP: %0.2fF", Vref, Temp);
+    sprintf(strbuf, "VREF: %0.2fV\nTEMP: %0.2fC", Vref, Temp);
         
     display_clear_framebuffer();
     display_write_string((const char *)strbuf, 1, 1);
