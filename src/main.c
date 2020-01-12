@@ -136,7 +136,11 @@ int main(void)
     VCL = (*p >> 0 ) & 0xFFF;
     VCH = (*p >> 12) & 0xFFF;
 
-    printf("TLI: %d, TLD: %d\nTHI: %d, THD: %d\n for TL: %0.2f TH: %0.2f\nVPL: %d, VPH: %d, VCL: %d, VCH: %d\n\n", TLI, TLD, THI, THD, TL, TH, VPL, VPH, VCL, VCH);
+    printf(" TLI: %d, TLD: %d\n", TLI, TLD);
+    printf(" THI: %d, THD: %d\n", THI, THD);
+    printf("  for TL: %0.2f TH: %0.2f\n", TL, TH);
+    printf(" VPL: %d, VPH: %d\n", VPL, VPH);
+    printf(" VCL: %d, VCH: %d\n\n", VCL, VCH);
 
     
     //
@@ -154,9 +158,9 @@ int main(void)
     hri_adc_write_CALIB_BIASREFBUF_bf(ADC0, biasrefbuf);
     hri_adc_write_CALIB_BIASR2R_bf(ADC0, biasr2r);
 
-    printf("BIASCOMP: 0x%01X\n", biascomp);
-    printf("BIASREFBUF: 0x%01X\n", biasrefbuf);
-    printf("BIASR2R: 0x%01X\n\n", biasr2r);
+    printf(" BIASCOMP: 0x%01X\n", biascomp);
+    printf(" BIASREFBUF: 0x%01X\n", biasrefbuf);
+    printf(" BIASR2R: 0x%01X\n\n", biasr2r);
 
 
     //
@@ -181,7 +185,7 @@ int main(void)
 
     
     SysTick_Config(4800000);
-    printf("enabled SysTick: 4800000\n");
+    printf("enabled SysTick: 4800000\n\n");
 
 
     printf("system up.\n\n");
