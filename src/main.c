@@ -74,11 +74,11 @@ int main(void)
 
     // initialize the UART
     uart_init();
-    uart_write("initialized UART\r\n");
+    printf("initialized UART\n");
 
     // initialize the LEDs
     led_init();
-    uart_write("initialized LEDs\r\n");
+    printf("initialized LEDs\n");
 
     // configure the display
     display_init(
@@ -87,7 +87,7 @@ int main(void)
         GPIO(GPIO_PORTC,  1), // data/command select
         GPIO(GPIO_PORTC, 14)  // spi slave select
         );
-    uart_write("initialized OLED display\r\n");
+    printf("initialized OLED display\n");
 
     display_clear();
 
@@ -95,28 +95,28 @@ int main(void)
     //
     // configure the SUPC
     //
-    uart_write("configuring SUPC: ");
+    printf("configuring SUPC: ");
 
     // enable on-demand mode
     hri_supc_set_VREF_ONDEMAND_bit(SUPC);
-    uart_write("ONDEMAND ");
+    printf("ONDEMAND ");
 
     // enable the temperature sensors
     hri_supc_set_VREF_TSEN_bit(SUPC);
-    uart_write("TSENS ");
+    printf("TSENS ");
 
     // enable the voltage referance
     hri_supc_set_VREF_VREFOE_bit(SUPC);
-    uart_write("VREF ");
+    printf("VREF ");
 
-    uart_write("done.\r\n");
+    printf("done.\n");
         
 
     //
     // grab the temperature calibration parameters
     //
 
-    uart_write("grab TSENS calibration params.\r\n");
+    printf("grab TSENS calibration params.\n");
 
     uint32_t *p = ((uint32_t *)NVMCTRL_TEMP_LOG);
 
@@ -136,10 +136,14 @@ int main(void)
     VCL = (*p >> 0 ) & 0xFFF;
     VCH = (*p >> 12) & 0xFFF;
 
+    printf("TLI: %d, TLD: %d\nTHI: %d, THD: %d\n for TL: %0.2f TH: %0.2f\nVPL: %d, VPH: %d, VCL: %d, VCH: %d\n\n", TLI, TLD, THI, THD, TL, TH, VPL, VPH, VCL, VCH);
+
     
     //
     // grab the ADC calibration parameters
     //
+
+    printf("grab ADC calibration params.\n");
 
     p = ((uint32_t *)0x00800080);
     uint8_t biascomp   = (*p >> 2) & 0x7;
@@ -150,12 +154,15 @@ int main(void)
     hri_adc_write_CALIB_BIASREFBUF_bf(ADC0, biasrefbuf);
     hri_adc_write_CALIB_BIASR2R_bf(ADC0, biasr2r);
 
-    uart_write("grab ADC calibration params.\r\n");
+    printf("BIASCOMP: 0x%01X\n", biascomp);
+    printf("BIASREFBUF: 0x%01X\n", biasrefbuf);
+    printf("BIASR2R: 0x%01X\n\n", biasr2r);
+
 
     //
     // configure the ADC
     //
-    uart_write("configuring ADC: ");
+    printf("configuring ADC: ");
     
     // set the muxbits POSMUX - PTAT, NEGMUX - GND, channel 0
     adc_async_set_inputs(&ADC_0, Muxes[CurrentMUX], 0x18, 0);
@@ -169,27 +176,28 @@ int main(void)
     // register the callbacks when we have some samples to read
     adc_async_register_callback(&ADC_0, 0, ADC_ASYNC_CONVERT_CB, convert_cb_ADC_0);
 
-    uart_write("done.\r\n");
+    printf("done.\n");
 
 
     
     SysTick_Config(4800000);
-    uart_write("enabled SysTick: 4800000\r\n");
+    printf("enabled SysTick: 4800000\n");
 
 
-    uart_write("system up.\r\n");
+    printf("system up.\n\n");
 
 
 
-    char strbuf2[500];
-    sprintf(strbuf2, "TLI: %d, TLD: %d\r\nTHI: %d, THD: %d\r\n for TL: %0.2f TH: %0.2f\r\nVPL: %d, VPH: %d, VCL: %d, VCH: %d\r\n\r\n\r\n", TLI, TLD, THI, THD, TL, TH, VPL, VPH, VCL, VCH);
-    uart_write(strbuf2);
 
 
     // wait for an interrupt.
     while (1)
     {
         adc_async_start_conversion(&ADC_0);
+
+        // printf("cmd$ ");
+        // scanf("%s", buf);
+        // printf("\n  executing: %s\n", buf);
 
         __WFI();
     }
@@ -206,7 +214,7 @@ void SysTick_Handler(void)
 
 
 
-    sprintf(strbuf, "VREF: %0.2fV\nTEMP: %0.2fC", Vref, Temp);
+    sprintf(strbuf, "VREF: %0.2fV\nTEMP: %0.2fF", Vref, Temp);
         
     display_clear_framebuffer();
     display_write_string((const char *)strbuf, 1, 1);
