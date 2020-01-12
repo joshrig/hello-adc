@@ -61,7 +61,7 @@ static void convert_cb_ADC_0
 
         Temp = TL * VPH * TC - VPL * TH * TC - TL * VCH * TP + TH * VCL * TP;
         Temp = Temp / (VCL * TP - VCH * TP - VPL * TC + VPH * TC);
-        Temp = Temp * 1.8 + 32.0;
+        Temp = Temp * 9 / 5 + 32.0;
     }
 }
 
@@ -74,7 +74,7 @@ int main(void)
 
     // initialize the UART
     uart_init();
-    printf("initialized UART\n");
+    printf("system initializing.\n\n");
 
     // initialize the LEDs
     led_init();
