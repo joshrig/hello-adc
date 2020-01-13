@@ -9,27 +9,34 @@
 #include "uart.h"
 
 
-static uint8_t Muxes[] = { 0x1B, 0x1C, 0x1D  };
+#define NMUX 4
+static uint8_t Muxes[NMUX] = { 0x1B, 0x0C, 0x1C, 0x1D };
 static uint8_t CurrentMUX = 0;
 
-static uint16_t TP = 0;
-static uint16_t TC = 0;
-static double   Vref = 0.0;
-static double   Temp = 0.0;
-
-
-static uint16_t TLI;
-static uint16_t TLD;
-static uint16_t THI;
-static uint16_t THD;
+// temperature calibration parameters
 static double   TL;
 static double   TH;
 static uint16_t VPL;
 static uint16_t VPH;
 static uint16_t VCL;
 static uint16_t VCH;
+// temperature counts
+static uint16_t PTAT = 0;
+static uint16_t CTAT = 0;
+
+// measured values
+static double Vref  = 0.0;
+static double Temp  = 0.0;
+static double Light = 0.0;
 
 
+
+static void recalculate_temp(void)
+{
+    Temp = TL * VPH * CTAT - VPL * TH * CTAT - TL * VCH * PTAT + TH * VCL * PTAT;
+    Temp = Temp / (VCL * PTAT - VCH * PTAT - VPL * CTAT + VPH * CTAT);
+    Temp = Temp * 9 / 5 + 32.0;
+}
 
 static void convert_cb_ADC_0
 (
@@ -47,21 +54,22 @@ static void convert_cb_ADC_0
 
         switch (Muxes[CurrentMUX])
         {
+        case 0x0C:
+            Light = (double)val / 4096.0;
+            break;
         case 0x1B:
             // with a bandgap voltage of 1V and 12bit conversions
             Vref = (double)val / 4096.0;
             break;
         case 0x1C:
-            TP = val;
+            PTAT = val;
             break;
         case 0x1D:
-            TC = val;
+            CTAT = val;
             break;
         }
 
-        Temp = TL * VPH * TC - VPL * TH * TC - TL * VCH * TP + TH * VCL * TP;
-        Temp = Temp / (VCL * TP - VCH * TP - VPL * TC + VPH * TC);
-        Temp = Temp * 9 / 5 + 32.0;
+        recalculate_temp();
     }
 }
 
@@ -77,8 +85,8 @@ int main(void)
     printf("system initializing.\n\n");
 
     // initialize the LEDs
-    led_init();
-    printf("initialized LEDs\n");
+    led_init(kLEDBlinkMode);
+    printf("initialized LEDs: %s\n", led_get_mode_string());
 
     // configure the display
     display_init(
@@ -120,10 +128,10 @@ int main(void)
 
     uint32_t *p = ((uint32_t *)NVMCTRL_TEMP_LOG);
 
-    TLI = (*p >> 0 ) & 0xFF;
-    TLD = (*p >> 8 ) & 0xF;
-    THI = (*p >> 12) & 0xFF;
-    THD = (*p >> 16) & 0xF;
+    uint8_t TLI = (*p >> 0 ) & 0xFF;
+    uint8_t TLD = (*p >> 8 ) & 0xF;
+    uint8_t THI = (*p >> 12) & 0xFF;
+    uint8_t THD = (*p >> 16) & 0xF;
 
     TL = (double)TLI + (double)TLD / 16.0;
     TH = (double)THI + (double)THD / 16.0;
@@ -167,6 +175,11 @@ int main(void)
     // configure the ADC
     //
     printf("configuring ADC: ");
+
+    // configure the light sensor pin
+    gpio_set_pin_direction(GPIO(GPIO_PORTB, 0), GPIO_DIRECTION_OFF);
+    gpio_set_pin_function (GPIO(GPIO_PORTB, 0), PINMUX_PB00B_ADC0_AIN12);
+
     
     // set the muxbits POSMUX - PTAT, NEGMUX - GND, channel 0
     adc_async_set_inputs(&ADC_0, Muxes[CurrentMUX], 0x18, 0);
@@ -216,16 +229,18 @@ void SysTick_Handler(void)
     led_update();
 
 
+    // sprintf(strbuf, "VREF: %0.2fV\nTEMP: %0.2fF", Vref, Temp);
+    sprintf(strbuf, "LGHT: %0.6fV\nTEMP: %0.2fF", Light, Temp);
 
-
-    sprintf(strbuf, "VREF: %0.2fV\nTEMP: %0.2fF", Vref, Temp);
-        
     display_clear_framebuffer();
     display_write_string((const char *)strbuf, 1, 1);
 
     CurrentMUX++;
-    if (CurrentMUX == 3)
+    if (CurrentMUX == NMUX)
         CurrentMUX = 0;
-
     adc_async_set_inputs(&ADC_0, Muxes[CurrentMUX], 0x18, 0);
+
+    printf("VREF: %0.2fV, ", Vref);
+    printf("LGHT: %0.4fV, ", Light);
+    printf("TEMP: %0.2fF\n", Temp);
 }
