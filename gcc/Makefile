@@ -147,7 +147,8 @@ DIR_INCLUDES +=  \
 -I"./hri" \
 -I"./" \
 -I"./CMSIS/Core/Include" \
--I"./include"
+-I"./include" \
+-I"/opt/local/arm-none-eabi/include"
 
 # List the dependency files
 DEPS := $(OBJS:%.o=%.d)

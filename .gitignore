@@ -2,3 +2,4 @@ GPATH
 GTAGS
 GRTAGS
 AtmelStart.*
+compile_commands.json
