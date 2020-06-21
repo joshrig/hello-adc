@@ -2,12 +2,17 @@ format_version: '2'
 name: My Project
 versions:
   api: '1.0'
-  backend: 1.6.148
-  commit: 605f106ab95776472e3febf2fac2471441fb1816
-  content: 1.0.1686
-  content_pack_name: acme-packs-all
+  backend: 1.7.360
+  commit: 1e07622763d149970fd8808a8f12ff3b1e84e0d7
+  content: unknown
+  content_pack_name: unknown
   format: '2'
-  frontend: 1.6.1894
+  frontend: 1.7.360
+  packs_version_avr8: 1.0.1415
+  packs_version_qtouch: unknown
+  packs_version_sam: 1.0.1622
+  version_backend: 1.7.360
+  version_frontend: ''
 board:
   identifier: SAME54XplainedPro
   device: SAME54P20A-AU
@@ -85,7 +90,7 @@ drivers:
     functionality: System
     api: HAL:HPL:DMAC
     configuration:
-      dmac_beatsize_0: 8-bit bus transfer
+      dmac_beatsize_0: 16-bit bus transfer
       dmac_beatsize_1: 8-bit bus transfer
       dmac_beatsize_10: 8-bit bus transfer
       dmac_beatsize_11: 8-bit bus transfer
@@ -181,7 +186,7 @@ drivers:
         the transaction
       dmac_blockact_9: Channel will be disabled if it is the last block transfer in
         the transaction
-      dmac_channel_0_settings: false
+      dmac_channel_0_settings: true
       dmac_channel_10_settings: false
       dmac_channel_11_settings: false
       dmac_channel_12_settings: false
@@ -214,7 +219,7 @@ drivers:
       dmac_channel_8_settings: false
       dmac_channel_9_settings: false
       dmac_dbgrun: false
-      dmac_dstinc_0: false
+      dmac_dstinc_0: true
       dmac_dstinc_1: false
       dmac_dstinc_10: false
       dmac_dstinc_11: false
@@ -246,7 +251,7 @@ drivers:
       dmac_dstinc_7: false
       dmac_dstinc_8: false
       dmac_dstinc_9: false
-      dmac_enable: false
+      dmac_enable: true
       dmac_evact_0: No action
       dmac_evact_1: No action
       dmac_evact_10: No action
@@ -547,7 +552,7 @@ drivers:
       dmac_stepsize_7: Next ADDR = ADDR + (BEATSIZE + 1) * 1
       dmac_stepsize_8: Next ADDR = ADDR + (BEATSIZE + 1) * 1
       dmac_stepsize_9: Next ADDR = ADDR + (BEATSIZE + 1) * 1
-      dmac_trifsrc_0: Only software/event triggers
+      dmac_trifsrc_0: ADC0 Result Ready Trigger
       dmac_trifsrc_1: Only software/event triggers
       dmac_trifsrc_10: Only software/event triggers
       dmac_trifsrc_11: Only software/event triggers
@@ -622,17 +627,29 @@ drivers:
     api: HAL:HPL:GCLK
     configuration:
       enable_gclk_gen_0: true
+      enable_gclk_gen_0__externalclock: 1000000
       enable_gclk_gen_1: false
       enable_gclk_gen_10: false
+      enable_gclk_gen_10__externalclock: 1000000
       enable_gclk_gen_11: false
+      enable_gclk_gen_11__externalclock: 1000000
+      enable_gclk_gen_1__externalclock: 1000000
       enable_gclk_gen_2: false
+      enable_gclk_gen_2__externalclock: 1000000
       enable_gclk_gen_3: false
+      enable_gclk_gen_3__externalclock: 1000000
       enable_gclk_gen_4: false
+      enable_gclk_gen_4__externalclock: 1000000
       enable_gclk_gen_5: false
+      enable_gclk_gen_5__externalclock: 1000000
       enable_gclk_gen_6: false
+      enable_gclk_gen_6__externalclock: 1000000
       enable_gclk_gen_7: false
+      enable_gclk_gen_7__externalclock: 1000000
       enable_gclk_gen_8: false
+      enable_gclk_gen_8__externalclock: 1000000
       enable_gclk_gen_9: false
+      enable_gclk_gen_9__externalclock: 1000000
       gclk_arch_gen_0_enable: true
       gclk_arch_gen_0_idc: false
       gclk_arch_gen_0_oe: false

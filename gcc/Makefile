@@ -147,8 +147,7 @@ DIR_INCLUDES +=  \
 -I"./hri" \
 -I"./" \
 -I"./CMSIS/Core/Include" \
--I"./include" \
--I"/opt/local/arm-none-eabi/include"
+-I"./include"
 
 # List the dependency files
 DEPS := $(OBJS:%.o=%.d)
@@ -223,7 +222,6 @@ $(OUTPUT_FILE_PATH): $(OBJS)
         "$(OUTPUT_FILE_NAME).eep" || exit 0
 	"arm-none-eabi-objdump" -h -S "$(OUTPUT_FILE_NAME).elf" > "$(OUTPUT_FILE_NAME).lss"
 	"arm-none-eabi-size" "$(OUTPUT_FILE_NAME).elf"
-
 
 # Compiler targets
 
