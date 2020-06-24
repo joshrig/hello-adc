@@ -11,26 +11,15 @@
 #include <utils.h>
 #include <hal_init.h>
 
-#include <hpl_adc_base.h>
-
-/* The channel amount for ADC */
-#define ADC_0_CH_AMOUNT 1
-
-/* The buffer size for ADC */
-#define ADC_0_BUFFER_SIZE 16
-
-/* The maximal channel number of enabled channels */
-#define ADC_0_CH_MAX 0
+#include <hpl_adc_dma.h>
 
 /*! The buffer size for USART */
 #define USART_0_BUFFER_SIZE 16
 
-struct adc_async_descriptor         ADC_0;
-struct adc_async_channel_descriptor ADC_0_ch[ADC_0_CH_AMOUNT];
-struct usart_async_descriptor       USART_0;
+struct usart_async_descriptor USART_0;
 
-static uint8_t ADC_0_buffer[ADC_0_BUFFER_SIZE];
-static uint8_t ADC_0_map[ADC_0_CH_MAX + 1];
+struct _adc_dma_device ADC_0;
+
 static uint8_t USART_0_buffer[USART_0_BUFFER_SIZE];
 
 struct spi_m_async_descriptor SPI_0;
@@ -44,8 +33,8 @@ void ADC_0_init(void)
 {
 	hri_mclk_set_APBDMASK_ADC0_bit(MCLK);
 	hri_gclk_write_PCHCTRL_reg(GCLK, ADC0_GCLK_ID, CONF_GCLK_ADC0_SRC | (1 << GCLK_PCHCTRL_CHEN_Pos));
-	adc_async_init(&ADC_0, ADC0, ADC_0_map, ADC_0_CH_MAX, ADC_0_CH_AMOUNT, &ADC_0_ch[0], (void *)NULL);
-	adc_async_register_channel_buffer(&ADC_0, 0, ADC_0_buffer, ADC_0_BUFFER_SIZE);
+
+        _adc_dma_init(&ADC_0, ADC0);
 }
 
 /**
