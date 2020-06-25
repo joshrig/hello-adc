@@ -224,40 +224,40 @@ static void _dmac_handler(void)
 		tmp_resource->dma_cb.transfer_done(tmp_resource);
 	}
 }
-/**
- * \brief DMAC interrupt handler
- */
-void DMAC_0_Handler(void)
-{
-	_dmac_handler();
-}
-/**
- * \brief DMAC interrupt handler
- */
-void DMAC_1_Handler(void)
-{
-	_dmac_handler();
-}
-/**
- * \brief DMAC interrupt handler
- */
-void DMAC_2_Handler(void)
-{
-	_dmac_handler();
-}
-/**
- * \brief DMAC interrupt handler
- */
-void DMAC_3_Handler(void)
-{
-	_dmac_handler();
-}
-/**
- * \brief DMAC interrupt handler
- */
-void DMAC_4_Handler(void)
-{
-	_dmac_handler();
-}
+// /**
+//  * \brief DMAC interrupt handler
+//  */
+// void DMAC_0_Handler(void)
+// {
+// 	_dmac_handler();
+// }
+// /**
+//  * \brief DMAC interrupt handler
+//  */
+// void DMAC_1_Handler(void)
+// {
+// 	_dmac_handler();
+// }
+// /**
+//  * \brief DMAC interrupt handler
+//  */
+// void DMAC_2_Handler(void)
+// {
+// 	_dmac_handler();
+// }
+// /**
+//  * \brief DMAC interrupt handler
+//  */
+// void DMAC_3_Handler(void)
+// {
+// 	_dmac_handler();
+// }
+// /**
+//  * \brief DMAC interrupt handler
+//  */
+// void DMAC_4_Handler(void)
+// {
+// 	_dmac_handler();
+// }
 
 #endif /* CONF_DMAC_ENABLE */
