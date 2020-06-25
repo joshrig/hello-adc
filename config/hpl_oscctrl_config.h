@@ -121,14 +121,14 @@
 // <i> Indicates whether configuration for XOSC1 is enabled or not
 // <id> enable_xosc1
 #ifndef CONF_XOSC1_CONFIG
-#define CONF_XOSC1_CONFIG 0
+#define CONF_XOSC1_CONFIG 1
 #endif
 
 // <o> Frequency <8000000-48000000>
 // <i> Oscillation frequency of the resonator connected to the External Multipurpose Crystal Oscillator.
 // <id> xosc1_frequency
 #ifndef CONF_XOSC_FREQUENCY
-#define CONF_XOSC1_FREQUENCY 48000000
+#define CONF_XOSC1_FREQUENCY 12000000
 #endif
 
 // <h> External Multipurpose Crystal Oscillator Control
@@ -136,7 +136,7 @@
 // <i> Indicates whether External Multipurpose Crystal Oscillator is enabled or not
 // <id> xosc1_arch_enable
 #ifndef CONF_XOSC1_ENABLE
-#define CONF_XOSC1_ENABLE 0
+#define CONF_XOSC1_ENABLE 1
 #endif
 
 // <o> Start-Up Time
@@ -234,7 +234,7 @@
 // <i> Indicates whether configuration for DFLL is enabled or not
 // <id> enable_dfll
 #ifndef CONF_DFLL_CONFIG
-#define CONF_DFLL_CONFIG 1
+#define CONF_DFLL_CONFIG 0
 #endif
 
 // <y> Reference Clock Source
@@ -261,7 +261,7 @@
 // <i> Indicates whether DFLL is enabled or not
 // <id> dfll_arch_enable
 #ifndef CONF_DFLL_ENABLE
-#define CONF_DFLL_ENABLE 1
+#define CONF_DFLL_ENABLE 0
 #endif
 
 // <q> On Demand Control

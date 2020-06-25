@@ -16,9 +16,8 @@
 /*! The buffer size for USART */
 #define USART_0_BUFFER_SIZE 16
 
-struct usart_async_descriptor USART_0;
-
-struct _adc_dma_device ADC_0;
+struct _adc_dma_device         ADC_0;
+struct usart_async_descriptor       USART_0;
 
 static uint8_t USART_0_buffer[USART_0_BUFFER_SIZE];
 
@@ -33,7 +32,6 @@ void ADC_0_init(void)
 {
 	hri_mclk_set_APBDMASK_ADC0_bit(MCLK);
 	hri_gclk_write_PCHCTRL_reg(GCLK, ADC0_GCLK_ID, CONF_GCLK_ADC0_SRC | (1 << GCLK_PCHCTRL_CHEN_Pos));
-
         _adc_dma_init(&ADC_0, ADC0);
 }
 

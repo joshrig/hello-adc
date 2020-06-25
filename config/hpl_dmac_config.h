@@ -122,7 +122,7 @@
 // <i> Defines the trigger action used for a transfer
 // <id> dmac_trigact_0
 #ifndef CONF_DMAC_TRIGACT_0
-#define CONF_DMAC_TRIGACT_0 0
+#define CONF_DMAC_TRIGACT_0 2
 #endif
 
 // <o> Trigger source
@@ -312,7 +312,7 @@
 // <i> Defines the the DMAC should take after a block transfer has completed
 // <id> dmac_blockact_0
 #ifndef CONF_DMAC_BLOCKACT_0
-#define CONF_DMAC_BLOCKACT_0 0
+#define CONF_DMAC_BLOCKACT_0 1
 #endif
 
 // <o> Event Output Selection

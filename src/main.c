@@ -15,6 +15,34 @@
 #include "uart.h"
 
 
+extern DmacDescriptor _descriptor_section[];
+extern uint16_t samp_buf_a[];
+extern uint16_t samp_buf_b[];
+
+void dmac_status(void)
+{
+    // printf("dmac enable: %d\n", hri_dmac_get_CTRL_DMAENABLE_bit(ADC0));
+    // printf("dmac ch0 enable: %d\n", hri_dmacchannel_get_CHCTRLA_ENABLE_bit(&DMAC->Channel[0]));
+    // printf("dmac ch1 enable: %d\n", hri_dmacchannel_get_CHCTRLA_ENABLE_bit(&DMAC->Channel[1]));
+
+    // printf("desc0 valid: %d\n", hri_dmacdescriptor_get_BTCTRL_VALID_bit(&_descriptor_section[0]));
+    // printf("desc1 valid: %d\n", hri_dmacdescriptor_get_BTCTRL_VALID_bit(&_descriptor_section[1]));
+    // printf("desc0 @ 0x%08X\n", (void *)&_descriptor_section[0]);
+    // printf("desc1 @ 0x%08X\n", (void *)&_descriptor_section[1]);
+    // printf("desc0 descaddr: 0x%08X\n", hri_dmacdescriptor_get_DESCADDR_reg(&_descriptor_section[0], 0xFFFFFFFF));
+    // printf("desc1 descaddr: 0x%08X\n", hri_dmacdescriptor_get_DESCADDR_reg(&_descriptor_section[1], 0xFFFFFFFF));
+
+    printf("samp_buf_a @ 0x%08X\n", (void *)samp_buf_a);
+    printf("samp_buf_b @ 0x%08X\n", (void *)samp_buf_b);
+    // printf("desc0 dstaddr: 0x%08X\n", hri_dmacdescriptor_get_DSTADDR_reg(&_descriptor_section[0], 0xFFFFFFFF));
+    // printf("desc1 dstaddr: 0x%08X\n", hri_dmacdescriptor_get_DSTADDR_reg(&_descriptor_section[1], 0xFFFFFFFF));
+    printf("desc0 dstaddr: 0x%08X\n", _descriptor_section[0].DSTADDR.reg);
+    printf("desc1 dstaddr: 0x%08X\n", _descriptor_section[1].DSTADDR.reg);
+
+    printf("\n\n");
+}
+
+
 
 int main(void)
 {
@@ -28,6 +56,10 @@ int main(void)
     printf("SAME54 serial: %s\n", mem_get_chip_serial());
     printf("system initializing.\n\n");
 
+    extern uint32_t _sstack;
+    extern uint32_t _estack;
+    printf("_sstack: 0x%08X\n", (void *)&_sstack);
+    printf("_estack: 0x%08X\n\n", (void *)&_estack);
 
     supc_init();
 
@@ -76,7 +108,7 @@ int main(void)
     printf("Starting ADC: ");
 
     adc_init(ADC0, &adc_cal);
-    adc_start();
+
 
     printf("done.\n");
 
@@ -105,16 +137,44 @@ int main(void)
 
 void SysTick_Handler(void)
 {
-    bool triggered;
     char buf[50];
 
-
+    
     led_update();
 
-    triggered = _adc_dma_is_conversion_done(&ADC_0);
-    sprintf(buf, "VREF: %0.2fV %s", bandgap_voltage, triggered ? "X" : "O");
+
+    _adc_dma_convert(&ADC_0);
+
+
+    extern double bandgap_voltage;
+
     display_clear_framebuffer();
+
+    sprintf(buf, "A: %d (%0.2f)", samp_buf_a[0], bandgap_voltage);
     display_write_string((const char *)buf, 1, 1);
+
+    sprintf(buf, "B: %d", samp_buf_b[0]);
+    display_write_string((const char *)buf, 1, 2);
+
+
+    int a = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        if (samp_buf_a[i] == 0)
+            continue;
+        a++;
+    }
+    int b = 0;
+    for (int i = 0; i < 4; i++)
+    {
+        if (samp_buf_b[i] == 0)
+            continue;
+        b++;
+    }
+    printf("samp_buf_a: %d nonzero samples\n", a);
+    printf("samp_buf_b: %d nonzero samples\n", b);
+
+    dmac_status();
 }
 
 

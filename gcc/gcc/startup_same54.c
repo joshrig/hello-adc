@@ -668,11 +668,22 @@ void Reset_Handler(void)
 		;
 }
 
+#include <stdio.h>
 /**
  * \brief Default interrupt handler for unused IRQs.
  */
 void Dummy_Handler(void)
 {
-	while (1) {
-	}
+    for (int i = 0; i < 138; i++)
+    {
+        printf("int(%d): ");
+
+        int active = NVIC_GetActive(i);
+        if (active)
+            printf("%s\n", active ? "active" : "nope");
+
+    }
+    fflush(stdout);
+
+    while (1);
 }

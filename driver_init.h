@@ -21,7 +21,7 @@ extern "C" {
 #include <hal_io.h>
 #include <hal_sleep.h>
 
-#include <hal_adc_async.h>
+#include <hpl_adc_dma.h>
 
 #include <hal_usart_async.h>
 
