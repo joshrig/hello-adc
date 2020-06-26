@@ -21,13 +21,13 @@ extern "C" {
 #include <hal_io.h>
 #include <hal_sleep.h>
 
-#include <hal_adc_async.h>
+#include <hpl_adc_dma.h>
 
 #include <hal_usart_async.h>
 
 #include <hal_spi_m_async.h>
 
-extern struct adc_async_descriptor   ADC_0;
+extern struct _adc_dma_device   ADC_0;
 extern struct usart_async_descriptor USART_0;
 
 extern struct spi_m_async_descriptor SPI_0;

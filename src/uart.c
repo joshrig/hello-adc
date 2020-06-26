@@ -51,6 +51,7 @@ int _write(int file, char *ptr, int len)
     uart_state_t *me = &uart_state;
 
 
+    // XXX polling byte-at-a-time, bad bad bad
     for (int todo = 0; todo < len; todo++)
     {
         io_write(me->io, (uint8_t *)ptr, 1);
@@ -71,20 +72,24 @@ int _write(int file, char *ptr, int len)
 // XXX borked
 int _read(int file, char *ptr, int len)
 {
-    uart_state_t *me = &uart_state;
-    int j = 0;
+    // uart_state_t *me = &uart_state;
+    // int j = 0;
 
-    uint8_t buf[50];
-    while (1)
-    {
-        j += io_read(me->io, (uint8_t *)&buf[j], 1);
+    // uint8_t buf[50];
+    // while (1)
+    // {
+    //     j += io_read(me->io, (uint8_t *)&buf[j], 1);
 
-        if (buf[j] == '\r')
-            break;
-    }
+    //     io_write(me->io, (uint8_t *)&buf[j], 1);
+    //     while (!usart_async_is_tx_empty(me->uart));
+
+    //     if (buf[j] == '\r')
+    //         break;
+    // }
 
 
-    memcpy(ptr, buf, j);
+    // memcpy(ptr, buf, j);
 
-    return j;
+    // return j;
+    return -1;
 }

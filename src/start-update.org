@@ -3,15 +3,19 @@
     LICENSE
     README.md
     src/
+    patches/
   - unzip the new archive in the top-level directory.
-  - edit gcc/Makefile
+  - edit gcc/Makefile (if necessary)
     - remove the fucked up line, emacs will tell you which one
+    - remove "examples" references
     - add the source files in "src/"
     - edit the include paths "../" to "./"
     - edit the linking line "../" to "./"
     - edit the linking line to get rid of the "specs" file reference
   - remove main.c from the top-level
+  - apply patches to:
+    hpl/dmac/hpl_dmac.c
+    driver_init.c
+    driver_init.h
   - touch(1) all the files.
-  - make sure to save the ATSTART file in the src/ directory for later
-    use.
 

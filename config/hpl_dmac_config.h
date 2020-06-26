@@ -8,7 +8,7 @@
 // <i> Indicates whether dmac is enabled or not
 // <id> dmac_enable
 #ifndef CONF_DMAC_ENABLE
-#define CONF_DMAC_ENABLE 0
+#define CONF_DMAC_ENABLE 1
 #endif
 
 // <q> Priority Level 0
@@ -105,7 +105,7 @@
 // <e> Channel 0 settings
 // <id> dmac_channel_0_settings
 #ifndef CONF_DMAC_CHANNEL_0_SETTINGS
-#define CONF_DMAC_CHANNEL_0_SETTINGS 0
+#define CONF_DMAC_CHANNEL_0_SETTINGS 1
 #endif
 
 // <q> Channel Run in Standby
@@ -122,7 +122,7 @@
 // <i> Defines the trigger action used for a transfer
 // <id> dmac_trigact_0
 #ifndef CONF_DMAC_TRIGACT_0
-#define CONF_DMAC_TRIGACT_0 0
+#define CONF_DMAC_TRIGACT_0 2
 #endif
 
 // <o> Trigger source
@@ -214,7 +214,7 @@
 // <i> Defines the peripheral trigger which is source of the transfer
 // <id> dmac_trifsrc_0
 #ifndef CONF_DMAC_TRIGSRC_0
-#define CONF_DMAC_TRIGSRC_0 0
+#define CONF_DMAC_TRIGSRC_0 68
 #endif
 
 // <o> Channel Arbitration Level
@@ -291,7 +291,7 @@
 // <i> Indicates whether the destination address incrementation is enabled or not
 // <id> dmac_dstinc_0
 #ifndef CONF_DMAC_DSTINC_0
-#define CONF_DMAC_DSTINC_0 0
+#define CONF_DMAC_DSTINC_0 1
 #endif
 
 // <o> Beat Size
@@ -301,7 +301,7 @@
 // <i> Defines the size of one beat
 // <id> dmac_beatsize_0
 #ifndef CONF_DMAC_BEATSIZE_0
-#define CONF_DMAC_BEATSIZE_0 0
+#define CONF_DMAC_BEATSIZE_0 1
 #endif
 
 // <o> Block Action
@@ -312,7 +312,7 @@
 // <i> Defines the the DMAC should take after a block transfer has completed
 // <id> dmac_blockact_0
 #ifndef CONF_DMAC_BLOCKACT_0
-#define CONF_DMAC_BLOCKACT_0 0
+#define CONF_DMAC_BLOCKACT_0 1
 #endif
 
 // <o> Event Output Selection
