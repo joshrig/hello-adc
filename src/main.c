@@ -18,7 +18,8 @@
 extern double light_sensor_volts;
 
 
-static bool update_displays = true;
+static bool update_display = true;
+static bool update_serial = true;
 
 
 int main(void)
@@ -103,13 +104,12 @@ int main(void)
     
     while (1)
     {
-        if (update_displays)
+        if (update_display)
         {
             char buf[50];
-            static int j = 0;
 
 
-            update_displays = false;
+            update_display = false;
     
             led_update();
 
@@ -128,12 +128,13 @@ int main(void)
                 display_write_string((const char *)buf, 2, 1);
             }
 
-            if (j++ > 67)
-            {
-                adc_print_status();
-                j = 0;
-            }
         }
+        if (update_serial)
+        {
+            update_serial = false;
+            adc_print_status();
+        }            
+
         
         __WFI();
     }
@@ -142,7 +143,16 @@ int main(void)
 
 void SysTick_Handler(void)
 {
-    update_displays = true;
+    static int j = 0;
+
+
+    update_display = true;
+
+    if (j++ > 67)
+    {
+        update_serial = true;
+        j = 0;
+    }
 }
 
 
