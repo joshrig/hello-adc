@@ -8,7 +8,7 @@
 #include "adc.h"
 
 
-#define ADC_BUFLEN 4
+#define ADC_BUFLEN 2048
 
 uint16_t samp_buf_a[ADC_BUFLEN];
 uint16_t samp_buf_b[ADC_BUFLEN];
@@ -16,6 +16,7 @@ uint16_t *current_buf = samp_buf_a;
 
 
 double light_sensor_counts = 0;
+bool dma_error = false;
 
 
 extern DmacDescriptor _descriptor_section[];
@@ -23,6 +24,7 @@ extern DmacDescriptor _descriptor_section[];
 
 static void dma_err_cb(struct _dma_resource *resource)
 {
+    dma_error = true;
 }
 
 static void dma_transfer_done_cb(struct _dma_resource *resource)
@@ -37,7 +39,11 @@ static void dma_transfer_done_cb(struct _dma_resource *resource)
 
     light_sensor_counts = avg_counts / (double)4096.;
 
-    current_buf = samp_buf_a == current_buf ? samp_buf_b : samp_buf_a;
+
+    if (current_buf == samp_buf_a)
+        current_buf = samp_buf_b;
+    else
+        current_buf = samp_buf_a;
 }
 
 
@@ -92,7 +98,9 @@ void adc_init(const void * const adc, mem_adc_cal_t *cal)
     _descriptor_section[1].SRCADDR = _descriptor_section[0].SRCADDR;
 
     // ok, now we can configure the unique parts of descriptor 1
-    _dma_set_destination_address(1, samp_buf_b + 4);
+    _dma_set_destination_address(1, samp_buf_b + 0x0800);
+
+    adc_print_status();
 
     // now circularly link the descriptors (the dumb way, the ASF way)
     _dma_set_next_descriptor(0, 1);
@@ -128,6 +136,7 @@ void adc_print_status(void)
     printf("samp_buf_b @ 0x%08X\n", (void *)samp_buf_b);
     printf("desc0 dstaddr: 0x%08X\n", hri_dmacdescriptor_get_DSTADDR_reg(&_descriptor_section[0], 0xFFFFFFFF));
     printf("desc1 dstaddr: 0x%08X\n", hri_dmacdescriptor_get_DSTADDR_reg(&_descriptor_section[1], 0xFFFFFFFF));
+    printf("val: %0.6f\n", light_sensor_counts);
 
     printf("\n\n");
 }

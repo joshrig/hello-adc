@@ -86,6 +86,8 @@ int main(void)
 
     adc_init(ADC0, &adc_cal);
 
+    _adc_dma_set_conversion_mode(&ADC_0, ADC_CONVERSION_MODE_FREERUN);
+    _adc_dma_convert(&ADC_0);
 
     printf("done.\n");
 
@@ -93,7 +95,7 @@ int main(void)
     //
     // SysTick is just used, for now, for the LEDs
     //
-    uint32_t systick_interval_ticks = 12000000;
+    uint32_t systick_interval_ticks = 360000;
     SysTick_Config(systick_interval_ticks);
     printf("SysTick interval: %0.3fs\n\n", (double)systick_interval_ticks / (double)CONF_CPU_FREQUENCY);
 
@@ -115,20 +117,27 @@ int main(void)
 void SysTick_Handler(void)
 {
     char buf[50];
+    static int j = 0;
 
     
     led_update();
 
-
-    _adc_dma_convert(&ADC_0);
-
-
     display_clear_framebuffer();
-    sprintf(buf, "0x0C: %0.2f", light_sensor_counts);
+    sprintf(buf, "0x0C: %0.6f", light_sensor_counts);
     display_write_string((const char *)buf, 1, 1);
 
+    extern bool dma_error;
+    if (dma_error)
+    {
+        sprintf(buf, "ERROR");
+        display_write_string((const char *)buf, 2, 1);
+    }
 
-    adc_print_status();
+    if (j++ > 67)
+    {
+        adc_print_status();
+        j = 0;
+    }
 }
 
 
@@ -248,6 +257,3 @@ static void convert_cb_ADC_0
     }
 }
 #endif
-
-
-
