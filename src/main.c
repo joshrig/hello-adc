@@ -126,6 +126,10 @@ void SysTick_Handler(void)
     sprintf(buf, "0x0C: %0.3f", light_sensor_counts);
     display_write_string((const char *)buf, 1, 1);
 
+    extern uint32_t ndma_interrupts;
+    sprintf(buf, "nint: %d", ndma_interrupts);
+    display_write_string((const char *)buf, 1, 2);
+
     extern bool dma_error;
     if (dma_error)
     {

@@ -17,7 +17,7 @@ uint16_t *current_buf = samp_buf_a;
 
 double light_sensor_counts = 0;
 bool dma_error = false;
-
+uint32_t ndma_interrupts = 0;
 
 extern DmacDescriptor _descriptor_section[];
 
@@ -39,7 +39,8 @@ static void dma_transfer_done_cb(struct _dma_resource *resource)
 
     light_sensor_counts = avg_counts / (double)4096.;
 
-
+    ndma_interrupts++;
+    
     if (current_buf == samp_buf_a)
         current_buf = samp_buf_b;
     else
@@ -86,18 +87,16 @@ void adc_init(const void * const adc, mem_adc_cal_t *cal)
     _dma_set_destination_address(0, samp_buf_a);
     _dma_set_data_amount(0, ADC_BUFLEN);
 
-
     // dmac descriptor 1, channel 0 (a.k.a. descriptor 0 channel 1,
     // read above)
 
     // since channel 1's descriptor hasn't been setup in _dma_init(),
-    // we'll copy the common fields from descriptor 0.
-
+    // but also because we must use as many ASF DMA APIs as possible,
+    // we'll copy just the BTCTRL field from descriptor 0.
     _descriptor_section[1].BTCTRL = _descriptor_section[0].BTCTRL;
-    _descriptor_section[1].BTCNT = _descriptor_section[0].BTCNT;
 
     // ok, now we can configure the unique parts of descriptor 1
-    _dma_set_source_address(0, (const void *)&REG_ADC0_RESULT);
+    _dma_set_source_address(1, (const void *)&REG_ADC0_RESULT);
     _dma_set_destination_address(1, samp_buf_b);
     _dma_set_data_amount(1, ADC_BUFLEN);
 
