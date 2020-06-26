@@ -123,7 +123,7 @@ void SysTick_Handler(void)
     led_update();
 
     display_clear_framebuffer();
-    sprintf(buf, "0x0C: %0.6f", light_sensor_counts);
+    sprintf(buf, "0x0C: %0.3f", light_sensor_counts);
     display_write_string((const char *)buf, 1, 1);
 
     extern bool dma_error;
