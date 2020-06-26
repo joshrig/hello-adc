@@ -90,7 +90,7 @@
 // <i> These bits define the Mux selection for the positive ADC input. (MUXPOS)
 // <id> adc_pinmux_positive
 #ifndef CONF_ADC_0_MUXPOS
-#define CONF_ADC_0_MUXPOS 0x1b
+#define CONF_ADC_0_MUXPOS 0xc
 #endif
 
 // <o> Negative Mux Input Selection

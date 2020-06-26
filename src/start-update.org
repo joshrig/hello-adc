@@ -1,11 +1,14 @@
 * How to integrate a new START archive into the project
+  - save the following files to a safe place
+    driver_init.[ch]
+    gcc/Makefile
   - remove all directories and files EXCEPT the following:
     LICENSE
     README.md
     src/
-    driver_init.[ch]
+    patches/
   - unzip the new archive in the top-level directory.
-  - edit gcc/Makefile (we could probably 
+  - edit gcc/Makefile (if necessary)
     - remove the fucked up line, emacs will tell you which one
     - remove "examples" references
     - add the source files in "src/"
@@ -13,6 +16,9 @@
     - edit the linking line "../" to "./"
     - edit the linking line to get rid of the "specs" file reference
   - remove main.c from the top-level
-  - remove examples/
+  - apply patches to:
+    hpl/dmac/hpl_dmac.c
+    driver_init.c
+    driver_init.h
   - touch(1) all the files.
 

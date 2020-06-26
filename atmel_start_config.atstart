@@ -53,11 +53,18 @@ drivers:
       adc_differential_mode: false
       adc_freerunning_mode: false
       adc_pinmux_negative: Internal ground
-      adc_pinmux_positive: Bandgap voltage
+      adc_pinmux_positive: ADC AIN12 pin
       adc_prescaler: Peripheral clock divided by 2
       adc_reference: Internal bandgap reference
       adc_resolution: 12-bit
-    optional_signals: []
+    optional_signals:
+    - identifier: ADC_0:AIN/12
+      pad: PB00
+      mode: Enabled
+      configuration: null
+      definition: Atmel:SAME54_Drivers:0.0.1::SAME54P20A-AU::optional_signal_definition::ADC0.AIN.12
+      name: ADC0/AIN/12
+      label: AIN/12
     variant: null
     clocks:
       domain_group:
@@ -123,7 +130,7 @@ drivers:
       dmac_beatsize_8: 8-bit bus transfer
       dmac_beatsize_9: 8-bit bus transfer
       dmac_blockact_0: Channel will be disabled if it is the last block transfer in
-        the transaction
+        the transaction and block interrupt
       dmac_blockact_1: Channel will be disabled if it is the last block transfer in
         the transaction
       dmac_blockact_10: Channel will be disabled if it is the last block transfer
@@ -584,7 +591,7 @@ drivers:
       dmac_trifsrc_7: Only software/event triggers
       dmac_trifsrc_8: Only software/event triggers
       dmac_trifsrc_9: Only software/event triggers
-      dmac_trigact_0: One trigger required for each block transfer
+      dmac_trigact_0: One trigger required for each beat transfer
       dmac_trigact_1: One trigger required for each block transfer
       dmac_trigact_10: One trigger required for each block transfer
       dmac_trigact_11: One trigger required for each block transfer
@@ -1016,7 +1023,7 @@ drivers:
       spi_master_arch_dord: MSB first
       spi_master_arch_ibon: In data stream
       spi_master_arch_runstdby: false
-      spi_master_baud_rate: 10000000
+      spi_master_baud_rate: 1000000
       spi_master_character_size: 8 bits
       spi_master_dummybyte: 511
       spi_master_rx_enable: false
@@ -1077,5 +1084,11 @@ pads:
     definition: Atmel:SAME54_Drivers:0.0.1::SAME54P20A-AU::pad::PB25
     mode: Peripheral IO
     user_label: PB25
+    configuration: null
+  PB00:
+    name: PB00
+    definition: Atmel:SAME54_Drivers:0.0.1::SAME54P20A-AU::pad::PB00
+    mode: Analog
+    user_label: PB00
     configuration: null
 toolchain_options: []
