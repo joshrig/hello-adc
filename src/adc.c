@@ -95,10 +95,11 @@ void adc_init(const void * const adc, mem_adc_cal_t *cal)
 
     _descriptor_section[1].BTCTRL = _descriptor_section[0].BTCTRL;
     _descriptor_section[1].BTCNT = _descriptor_section[0].BTCNT;
-    _descriptor_section[1].SRCADDR = _descriptor_section[0].SRCADDR;
 
     // ok, now we can configure the unique parts of descriptor 1
-    _dma_set_destination_address(1, samp_buf_b + 0x0800);
+    _dma_set_source_address(0, (const void *)&REG_ADC0_RESULT);
+    _dma_set_destination_address(1, samp_buf_b);
+    _dma_set_data_amount(1, ADC_BUFLEN);
 
     adc_print_status();
 
