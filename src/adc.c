@@ -68,12 +68,6 @@ void adc_init(const void * const adc, mem_adc_cal_t *cal)
     // links descriptors in two different channel slots. I don't even
     // see the point of this function? 
 
-    
-
-
-
-
-
 
     // NOTE
     // part of descriptor 0's setup is completed by _dma_init() using
@@ -95,7 +89,6 @@ void adc_init(const void * const adc, mem_adc_cal_t *cal)
     _dma_set_source_address(1, (const void *)&REG_ADC0_RESULT);
     _dma_set_destination_address(1, samp_buf_b);
     _dma_set_data_amount(1, ADC_BUFLEN);
-
 
 
     // now circularly link the descriptors (the dumb way, the ASF way)
@@ -135,51 +128,22 @@ void adc_init(const void * const adc, mem_adc_cal_t *cal)
 
 void adc_print_status(void)
 {
-    printf("dmac enable: %d\n", hri_dmac_get_CTRL_DMAENABLE_bit(ADC0));
-    printf("dmac ch0 enable: %d\n", hri_dmacchannel_get_CHCTRLA_ENABLE_bit(&DMAC->Channel[0]));
-    printf("dmac ch1 enable: %d\n", hri_dmacchannel_get_CHCTRLA_ENABLE_bit(&DMAC->Channel[1]));
+    // printf("dmac enable: %d\n", hri_dmac_get_CTRL_DMAENABLE_bit(ADC0));
+    // printf("dmac ch0 enable: %d\n", hri_dmacchannel_get_CHCTRLA_ENABLE_bit(&DMAC->Channel[0]));
+    // printf("dmac ch1 enable: %d\n", hri_dmacchannel_get_CHCTRLA_ENABLE_bit(&DMAC->Channel[1]));
 
-    printf("desc0 valid: %d\n", hri_dmacdescriptor_get_BTCTRL_VALID_bit(&_descriptor_section[0]));
-    printf("desc1 valid: %d\n", hri_dmacdescriptor_get_BTCTRL_VALID_bit(&_descriptor_section[1]));
-    printf("desc0 @ 0x%08X\n", (void *)&_descriptor_section[0]);
-    printf("desc1 @ 0x%08X\n", (void *)&_descriptor_section[1]);
-    printf("desc0 descaddr: 0x%08X\n", hri_dmacdescriptor_get_DESCADDR_reg(&_descriptor_section[0], 0xFFFFFFFF));
-    printf("desc1 descaddr: 0x%08X\n", hri_dmacdescriptor_get_DESCADDR_reg(&_descriptor_section[1], 0xFFFFFFFF));
+    // printf("desc0 valid: %d\n", hri_dmacdescriptor_get_BTCTRL_VALID_bit(&_descriptor_section[0]));
+    // printf("desc1 valid: %d\n", hri_dmacdescriptor_get_BTCTRL_VALID_bit(&_descriptor_section[1]));
+    // printf("desc0 @ 0x%08X\n", (void *)&_descriptor_section[0]);
+    // printf("desc1 @ 0x%08X\n", (void *)&_descriptor_section[1]);
+    // printf("desc0 descaddr: 0x%08X\n", hri_dmacdescriptor_get_DESCADDR_reg(&_descriptor_section[0], 0xFFFFFFFF));
+    // printf("desc1 descaddr: 0x%08X\n", hri_dmacdescriptor_get_DESCADDR_reg(&_descriptor_section[1], 0xFFFFFFFF));
 
-    printf("samp_buf_a @ 0x%08X\n", (void *)samp_buf_a);
-    printf("samp_buf_b @ 0x%08X\n", (void *)samp_buf_b);
-    printf("desc0 dstaddr: 0x%08X\n", hri_dmacdescriptor_get_DSTADDR_reg(&_descriptor_section[0], 0xFFFFFFFF));
-    printf("desc1 dstaddr: 0x%08X\n", hri_dmacdescriptor_get_DSTADDR_reg(&_descriptor_section[1], 0xFFFFFFFF));
+    // printf("samp_buf_a @ 0x%08X\n", (void *)samp_buf_a);
+    // printf("samp_buf_b @ 0x%08X\n", (void *)samp_buf_b);
+    // printf("desc0 dstaddr: 0x%08X\n", hri_dmacdescriptor_get_DSTADDR_reg(&_descriptor_section[0], 0xFFFFFFFF));
+    // printf("desc1 dstaddr: 0x%08X\n", hri_dmacdescriptor_get_DSTADDR_reg(&_descriptor_section[1], 0xFFFFFFFF));
     printf("val: %0.6f\n", light_sensor_counts);
 
-    printf("\n\n");
+    // printf("\n\n");
 }
-
-
-
-
-    // int a = 0;
-    // for (int i = 0; i < 4; i++)
-    // {
-    //     if (samp_buf_a[i] == 0)
-    //         continue;
-    //     a++;
-    // }
-    // int b = 0;
-    // for (int i = 0; i < 4; i++)
-    // {
-    //     if (samp_buf_b[i] == 0)
-    //         continue;
-    //     b++;
-    // }
-    // printf("samp_buf_a: %d nonzero samples\n", a);
-    // printf("samp_buf_b: %d nonzero samples\n", b);
-
-    // if (a == 4)
-    //     for (int i = 0; i < 4; i++)
-    //         samp_buf_a[i] = 0;
-
-    // if (b == 4)
-    //     for (int i = 0; i < 4; i++)
-    //         samp_buf_b[i] = 0;
-
