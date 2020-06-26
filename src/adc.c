@@ -54,13 +54,6 @@ void adc_init(const void * const adc, mem_adc_cal_t *cal)
     ASSERT(cal);
 
 
-    // write the calibration values
-    hri_adc_write_CALIB_BIASCOMP_bf(adc, cal->biascomp);
-    hri_adc_write_CALIB_BIASREFBUF_bf(adc, cal->biasrefbuf);
-    hri_adc_write_CALIB_BIASR2R_bf(adc, cal->biasr2r);
-
-
-    // XXX we do this ourselves now since ASF is fucking broken...
     // dma callbacks 
     struct _dma_resource *resource;
     _dma_get_channel_resource(&resource, 0);
@@ -78,29 +71,24 @@ void adc_init(const void * const adc, mem_adc_cal_t *cal)
     // see the point of this function? 
 
     
-    // dmac descriptor 0, channel 0
-    
-    // NOTE part of descriptor 0's setup is completed by
-    // _dma_init() using the parameters configured in START.
+    // NOTE
+    // part of descriptor 0's setup is completed by _dma_init() using
+    // the parameters configured in START.
     // 
+
+    // dmac descriptor 0, channel 0
     _dma_set_source_address(0, (const void *)&REG_ADC0_RESULT);
     _dma_set_destination_address(0, samp_buf_a);
     _dma_set_data_amount(0, ADC_BUFLEN);
 
-    // dmac descriptor 1, channel 0 (a.k.a. descriptor 0 channel 1,
-    // read above)
-
-    // since channel 1's descriptor hasn't been setup in _dma_init(),
-    // but also because we must use as many ASF DMA APIs as possible,
-    // we'll copy just the BTCTRL field from descriptor 0.
-    _descriptor_section[1].BTCTRL = _descriptor_section[0].BTCTRL;
-
-    // ok, now we can configure the unique parts of descriptor 1
+    // dmac descriptor 1, channel 0 (a.k.a. desc0 ch1)
     _dma_set_source_address(1, (const void *)&REG_ADC0_RESULT);
     _dma_set_destination_address(1, samp_buf_b);
     _dma_set_data_amount(1, ADC_BUFLEN);
 
-    adc_print_status();
+    // since channel 1's descriptor hasn't been setup in _dma_init()
+    _descriptor_section[1].BTCTRL = _descriptor_section[0].BTCTRL;
+
 
     // now circularly link the descriptors (the dumb way, the ASF way)
     _dma_set_next_descriptor(0, 1);
@@ -110,12 +98,21 @@ void adc_init(const void * const adc, mem_adc_cal_t *cal)
     hri_dmacdescriptor_set_BTCTRL_VALID_bit(&_descriptor_section[0]);
     hri_dmacdescriptor_set_BTCTRL_VALID_bit(&_descriptor_section[1]);
 
+    // enable dma channel 0
     hri_dmac_set_CHCTRLA_ENABLE_bit(DMAC, 0);
-    
+
+    // enable the dma IRQs
     _dma_set_irq_state(0, DMA_TRANSFER_COMPLETE_CB, true);
     _dma_set_irq_state(0, DMA_TRANSFER_ERROR_CB, true);
 
-    // now setup the adc
+
+    // now setup adc0
+
+    // write the calibration values
+    hri_adc_write_CALIB_BIASCOMP_bf(adc, cal->biascomp);
+    hri_adc_write_CALIB_BIASREFBUF_bf(adc, cal->biasrefbuf);
+    hri_adc_write_CALIB_BIASR2R_bf(adc, cal->biasr2r);
+
     _adc_dma_set_conversion_mode(&ADC_0, ADC_CONVERSION_MODE_FREERUN);
     _adc_dma_enable_channel(&ADC_0, 0);
     _adc_dma_convert(&ADC_0);

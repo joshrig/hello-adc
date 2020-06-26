@@ -18,7 +18,7 @@
 extern double light_sensor_counts;
 
 
-
+static bool update_displays = true;
 
 
 int main(void)
@@ -97,15 +97,44 @@ int main(void)
     printf("SysTick interval: %0.3fs\n\n", (double)systick_interval_ticks / (double)CONF_CPU_FREQUENCY);
 
 
-    
     printf("system up.\n\n");
     fflush(stdout);
 
     
-
-    // wait for an interrupt.
     while (1)
     {
+        if (update_displays)
+        {
+            char buf[50];
+            static int j = 0;
+
+
+            update_displays = false;
+    
+            led_update();
+
+            display_clear_framebuffer();
+            sprintf(buf, "0x0C: %0.3f", light_sensor_counts);
+            display_write_string((const char *)buf, 1, 1);
+
+            extern uint32_t ndma_interrupts;
+            sprintf(buf, "%d", ndma_interrupts);
+            display_write_string((const char *)buf, 1, 2);
+
+            extern bool dma_error;
+            if (dma_error)
+            {
+                sprintf(buf, "ERROR");
+                display_write_string((const char *)buf, 2, 1);
+            }
+
+            if (j++ > 67)
+            {
+                adc_print_status();
+                j = 0;
+            }
+        }
+        
         __WFI();
     }
 }
@@ -113,32 +142,7 @@ int main(void)
 
 void SysTick_Handler(void)
 {
-    char buf[50];
-    static int j = 0;
-
-    
-    led_update();
-
-    display_clear_framebuffer();
-    sprintf(buf, "0x0C: %0.3f", light_sensor_counts);
-    display_write_string((const char *)buf, 1, 1);
-
-    extern uint32_t ndma_interrupts;
-    sprintf(buf, "nint: %d", ndma_interrupts);
-    display_write_string((const char *)buf, 1, 2);
-
-    extern bool dma_error;
-    if (dma_error)
-    {
-        sprintf(buf, "ERROR");
-        display_write_string((const char *)buf, 2, 1);
-    }
-
-    if (j++ > 67)
-    {
-        adc_print_status();
-        j = 0;
-    }
+    update_displays = true;
 }
 
 
