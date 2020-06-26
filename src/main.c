@@ -146,80 +146,7 @@ void SysTick_Handler(void)
 }
 
 
-
-
-
-
 #if 0
-void SysTick_Handler(void)
-{
-    char strbuf[50];
-
-    
-    led_update();
-
-
-    // sprintf(strbuf, "VREF: %0.2fV\nTEMP: %0.2fF", Vref, Temp);
-    sprintf(strbuf, "LGHT: %0.6fV\nTEMP: %0.2fF", Light, Temp);
-
-    display_clear_framebuffer();
-    display_write_string((const char *)strbuf, 1, 1);
-
-    CurrentMUX++;
-    if (CurrentMUX == NMUX)
-        CurrentMUX = 0;
-    adc_async_set_inputs(&ADC_0, Muxes[CurrentMUX], 0x18, 0);
-
-    printf("VREF: %0.2fV, ", Vref);
-    printf("LGHT: %0.4fV, ", Light);
-    printf("TEMP: %0.2fF\n", Temp);
-}
-
-
-
-
-
-    // configure the light sensor pin
-    gpio_set_pin_direction(GPIO(GPIO_PORTB, 0), GPIO_DIRECTION_OFF);
-    gpio_set_pin_function (GPIO(GPIO_PORTB, 0), PINMUX_PB00B_ADC0_AIN12);
-
-    
-    // set the muxbits POSMUX - PTAT, NEGMUX - GND, channel 0
-    adc_async_set_inputs(&ADC_0, Muxes[CurrentMUX], 0x18, 0);
-
-    // set the ADC to freerun (this doesn't work for some reason)
-    adc_async_set_conversion_mode(&ADC_0, ADC_CONVERSION_MODE_FREERUN);
-
-    // NOTE: all this does is turn on the ADC
-    adc_async_enable_channel(&ADC_0, 0);
-
-    // register the callbacks when we have some samples to read
-    adc_async_register_callback(&ADC_0, 0, ADC_ASYNC_CONVERT_CB, convert_cb_ADC_0);
-
-
-
-#define NMUX 4
-static uint8_t Muxes[NMUX] = { 0x1B, 0x0C, 0x1C, 0x1D };
-static uint8_t CurrentMUX = 0;
-
-// temperature calibration parameters
-static double   TL;
-static double   TH;
-static uint16_t VPL;
-static uint16_t VPH;
-static uint16_t VCL;
-static uint16_t VCH;
-// temperature counts
-static uint16_t PTAT = 0;
-static uint16_t CTAT = 0;
-
-// measured values
-static double Vref  = 0.0;
-static double Temp  = 0.0;
-static double Light = 0.0;
-
-
-
 static void recalculate_temp(void)
 {
     Temp = TL * VPH * CTAT - VPL * TH * CTAT - TL * VCH * PTAT + TH * VCL * PTAT;
@@ -227,38 +154,10 @@ static void recalculate_temp(void)
     Temp = Temp * 9 / 5 + 32.0;
 }
 
-static void convert_cb_ADC_0
-(
-    const struct adc_async_descriptor *const descr,
-    const uint8_t channel
-)
-{
-    uint8_t buf[16];
-    int32_t nbytes;
-
-    nbytes = adc_async_read_channel(&ADC_0, channel, buf, 16);
-    if (nbytes > 0)
-    {
-        uint16_t val = buf[0] | (buf[1] << 8);
-
-        switch (Muxes[CurrentMUX])
-        {
-        case 0x0C:
-            Light = (double)val / 4096.0;
-            break;
-        case 0x1B:
-            // with a bandgap voltage of 1V and 12bit conversions
-            Vref = (double)val / 4096.0;
-            break;
         case 0x1C:
             PTAT = val;
             break;
         case 0x1D:
             CTAT = val;
             break;
-        }
-
-        recalculate_temp();
-    }
-}
 #endif
