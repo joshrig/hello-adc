@@ -116,7 +116,9 @@ void adc_init(const void * const adc, mem_adc_cal_t *cal)
     _dma_set_irq_state(0, DMA_TRANSFER_ERROR_CB, true);
 
     // now setup the adc
+    _adc_dma_set_conversion_mode(&ADC_0, ADC_CONVERSION_MODE_FREERUN);
     _adc_dma_enable_channel(&ADC_0, 0);
+    _adc_dma_convert(&ADC_0);
 }
 
 void adc_print_status(void)

@@ -86,9 +86,6 @@ int main(void)
 
     adc_init(ADC0, &adc_cal);
 
-    _adc_dma_set_conversion_mode(&ADC_0, ADC_CONVERSION_MODE_FREERUN);
-    _adc_dma_convert(&ADC_0);
-
     printf("done.\n");
 
 
