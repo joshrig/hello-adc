@@ -40,13 +40,9 @@ static void dma_transfer_done_cb(struct _dma_resource *resource)
     light_sensor_counts = avg_counts / (double)4096.;
 
     ndma_interrupts++;
-    
-    if (current_buf == samp_buf_a)
-        current_buf = samp_buf_b;
-    else
-        current_buf = samp_buf_a;
 
-//    current_buf = current_buf == samp_buf_a ? samp_buf_b : samp_buf_a;
+    // fancy buffer swap!
+    current_buf = current_buf == samp_buf_a ? samp_buf_b : samp_buf_a;
 }
 
 
@@ -73,6 +69,12 @@ void adc_init(const void * const adc, mem_adc_cal_t *cal)
     // see the point of this function? 
 
     
+
+
+
+
+
+
     // NOTE
     // part of descriptor 0's setup is completed by _dma_init() using
     // the parameters configured in START.
