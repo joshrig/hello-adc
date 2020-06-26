@@ -15,7 +15,7 @@ uint16_t samp_buf_b[ADC_BUFLEN];
 uint16_t *current_buf = samp_buf_a;
 
 
-double light_sensor_counts = 0;
+double light_sensor_volts = 0;
 bool dma_error = false;
 uint32_t ndma_interrupts = 0;
 
@@ -37,7 +37,7 @@ static void dma_transfer_done_cb(struct _dma_resource *resource)
 
     avg_counts = (double)sum / (double)ADC_BUFLEN;
 
-    light_sensor_counts = avg_counts / (double)4096.;
+    light_sensor_volts = avg_counts / (double)4096.;
 
     ndma_interrupts++;
 
@@ -143,7 +143,7 @@ void adc_print_status(void)
     // printf("samp_buf_b @ 0x%08X\n", (void *)samp_buf_b);
     // printf("desc0 dstaddr: 0x%08X\n", hri_dmacdescriptor_get_DSTADDR_reg(&_descriptor_section[0], 0xFFFFFFFF));
     // printf("desc1 dstaddr: 0x%08X\n", hri_dmacdescriptor_get_DSTADDR_reg(&_descriptor_section[1], 0xFFFFFFFF));
-    printf("val: %0.6f\n", light_sensor_counts);
+    printf("%0.3fV\n", light_sensor_volts);
 
     // printf("\n\n");
 }

@@ -15,7 +15,7 @@
 #include "uart.h"
 
 
-extern double light_sensor_counts;
+extern double light_sensor_volts;
 
 
 static bool update_displays = true;
@@ -114,7 +114,7 @@ int main(void)
             led_update();
 
             display_clear_framebuffer();
-            sprintf(buf, "0x0C: %0.3f", light_sensor_counts);
+            sprintf(buf, "LGHT: %0.3fV", light_sensor_volts);
             display_write_string((const char *)buf, 1, 1);
 
             extern uint32_t ndma_interrupts;
