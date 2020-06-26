@@ -11,5 +11,6 @@ extern double bandgap_voltage;
 
 void adc_init(const void * const, mem_adc_cal_t *);
 void adc_start(void);
+void adc_print_status(void);
 
 #endif

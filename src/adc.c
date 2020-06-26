@@ -10,67 +10,34 @@
 
 #define ADC_BUFLEN 4
 
-COMPILER_ALIGNED(16)
 uint16_t samp_buf_a[ADC_BUFLEN];
-COMPILER_ALIGNED(16)
 uint16_t samp_buf_b[ADC_BUFLEN];
+uint16_t *current_buf = samp_buf_a;
 
 
-double bandgap_voltage = 42;
+double light_sensor_counts = 0;
 
 
-extern void dmac_status(void);
+extern DmacDescriptor _descriptor_section[];
 
 
-static void dma_err_cb()
+static void dma_err_cb(struct _dma_resource *resource)
 {
-    bandgap_voltage = 17;
 }
 
-static void dma_transfer_done_cb()
+static void dma_transfer_done_cb(struct _dma_resource *resource)
 {
-// //    hri_dmacdescriptor_set_BTCTRL_VALID_bit(&_descriptor_section[0]);
-// //    hri_dmacdescriptor_set_BTCTRL_VALID_bit(&_descriptor_section[1]);
+    uint32_t sum = 0;
+    double avg_counts;
 
-    
-//     uint32_t sum_a = 0;
-//     uint32_t sum_b = 0;
-//     uint32_t sum;
-//     double avg_counts;
-
-//     for (int i = 0; i < ADC_BUFLEN; i++)
-//     {
-//         sum_a += samp_buf_a[i];
-//         sum_b += samp_buf_b[i];
-//     }
-//     sum = (sum_a + sum_b) / 2;
-//     avg_counts = (double)sum / (double)ADC_BUFLEN;
-
-//     bandgap_voltage = avg_counts / (double)4096.;
     for (int i = 0; i < ADC_BUFLEN; i++)
-    {
-        samp_buf_a[i] = 0;
-        samp_buf_b[i] = 0;
-    }
-    bandgap_voltage += 42;
-}
+        sum += current_buf[i];
 
+    avg_counts = (double)sum / (double)ADC_BUFLEN;
 
-void DMAC_0_Handler(void)
-{
-    uint8_t channel = hri_dmac_get_INTPEND_reg(DMAC, DMAC_INTPEND_ID_Msk);
-    
-    if (hri_dmac_get_INTPEND_TERR_bit(DMAC)) {
-        hri_dmac_clear_CHINTFLAG_TERR_bit(DMAC, channel);
-        
-        dma_err_cb();
-        
-    } else if (hri_dmac_get_INTPEND_TCMPL_bit(DMAC)) {
-        hri_dmac_clear_CHINTFLAG_TCMPL_bit(DMAC, channel);
-        
-        dma_transfer_done_cb();
-        
-    }
+    light_sensor_counts = avg_counts / (double)4096.;
+
+    current_buf = samp_buf_a == current_buf ? samp_buf_b : samp_buf_a;
 }
 
 
@@ -80,8 +47,6 @@ void adc_init(const void * const adc, mem_adc_cal_t *cal)
     ASSERT(cal);
 
 
-    dmac_status();
-    
     // write the calibration values
     hri_adc_write_CALIB_BIASCOMP_bf(adc, cal->biascomp);
     hri_adc_write_CALIB_BIASREFBUF_bf(adc, cal->biasrefbuf);
@@ -90,10 +55,10 @@ void adc_init(const void * const adc, mem_adc_cal_t *cal)
 
     // XXX we do this ourselves now since ASF is fucking broken...
     // dma callbacks 
-    // struct _dma_resource *resource;
-    // _dma_get_channel_resource(&resource, 0);
-    // resource->dma_cb.error = dma_err_cb;
-    // resource->dma_cb.transfer_done = dma_transfer_done_cb;
+    struct _dma_resource *resource;
+    _dma_get_channel_resource(&resource, 0);
+    resource->dma_cb.error = dma_err_cb;
+    resource->dma_cb.transfer_done = dma_transfer_done_cb;
     
 
     // XXX
@@ -106,8 +71,6 @@ void adc_init(const void * const adc, mem_adc_cal_t *cal)
     // see the point of this function? 
 
     
-    extern DmacDescriptor _descriptor_section[];
-
     // dmac descriptor 0, channel 0
     
     // NOTE part of descriptor 0's setup is completed by
@@ -129,22 +92,71 @@ void adc_init(const void * const adc, mem_adc_cal_t *cal)
     _descriptor_section[1].SRCADDR = _descriptor_section[0].SRCADDR;
 
     // ok, now we can configure the unique parts of descriptor 1
-    _dma_set_destination_address(1, samp_buf_b);
+    _dma_set_destination_address(1, samp_buf_b + 4);
 
     // now circularly link the descriptors (the dumb way, the ASF way)
     _dma_set_next_descriptor(0, 1);
-//    _dma_set_next_descriptor(1, 0);
+    _dma_set_next_descriptor(1, 0);
 
     // enable the descriptors
     hri_dmacdescriptor_set_BTCTRL_VALID_bit(&_descriptor_section[0]);
     hri_dmacdescriptor_set_BTCTRL_VALID_bit(&_descriptor_section[1]);
 
-    dmac_status();
-    // hri_dmac_set_CHCTRLA_ENABLE_bit(DMAC, 0);
+    hri_dmac_set_CHCTRLA_ENABLE_bit(DMAC, 0);
     
-    // _dma_set_irq_state(0, DMA_TRANSFER_COMPLETE_CB, true);
-    // _dma_set_irq_state(0, DMA_TRANSFER_ERROR_CB, true);
+    _dma_set_irq_state(0, DMA_TRANSFER_COMPLETE_CB, true);
+    _dma_set_irq_state(0, DMA_TRANSFER_ERROR_CB, true);
 
     // now setup the adc
     _adc_dma_enable_channel(&ADC_0, 0);
 }
+
+void adc_print_status(void)
+{
+    printf("dmac enable: %d\n", hri_dmac_get_CTRL_DMAENABLE_bit(ADC0));
+    printf("dmac ch0 enable: %d\n", hri_dmacchannel_get_CHCTRLA_ENABLE_bit(&DMAC->Channel[0]));
+    printf("dmac ch1 enable: %d\n", hri_dmacchannel_get_CHCTRLA_ENABLE_bit(&DMAC->Channel[1]));
+
+    printf("desc0 valid: %d\n", hri_dmacdescriptor_get_BTCTRL_VALID_bit(&_descriptor_section[0]));
+    printf("desc1 valid: %d\n", hri_dmacdescriptor_get_BTCTRL_VALID_bit(&_descriptor_section[1]));
+    printf("desc0 @ 0x%08X\n", (void *)&_descriptor_section[0]);
+    printf("desc1 @ 0x%08X\n", (void *)&_descriptor_section[1]);
+    printf("desc0 descaddr: 0x%08X\n", hri_dmacdescriptor_get_DESCADDR_reg(&_descriptor_section[0], 0xFFFFFFFF));
+    printf("desc1 descaddr: 0x%08X\n", hri_dmacdescriptor_get_DESCADDR_reg(&_descriptor_section[1], 0xFFFFFFFF));
+
+    printf("samp_buf_a @ 0x%08X\n", (void *)samp_buf_a);
+    printf("samp_buf_b @ 0x%08X\n", (void *)samp_buf_b);
+    printf("desc0 dstaddr: 0x%08X\n", hri_dmacdescriptor_get_DSTADDR_reg(&_descriptor_section[0], 0xFFFFFFFF));
+    printf("desc1 dstaddr: 0x%08X\n", hri_dmacdescriptor_get_DSTADDR_reg(&_descriptor_section[1], 0xFFFFFFFF));
+
+    printf("\n\n");
+}
+
+
+
+
+    // int a = 0;
+    // for (int i = 0; i < 4; i++)
+    // {
+    //     if (samp_buf_a[i] == 0)
+    //         continue;
+    //     a++;
+    // }
+    // int b = 0;
+    // for (int i = 0; i < 4; i++)
+    // {
+    //     if (samp_buf_b[i] == 0)
+    //         continue;
+    //     b++;
+    // }
+    // printf("samp_buf_a: %d nonzero samples\n", a);
+    // printf("samp_buf_b: %d nonzero samples\n", b);
+
+    // if (a == 4)
+    //     for (int i = 0; i < 4; i++)
+    //         samp_buf_a[i] = 0;
+
+    // if (b == 4)
+    //     for (int i = 0; i < 4; i++)
+    //         samp_buf_b[i] = 0;
+

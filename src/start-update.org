@@ -1,7 +1,4 @@
 * How to integrate a new START archive into the project
-  - save the following files to a safe place
-    driver_init.[ch]
-    gcc/Makefile
   - remove all directories and files EXCEPT the following:
     LICENSE
     README.md
