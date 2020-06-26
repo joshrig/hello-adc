@@ -45,6 +45,8 @@ static void dma_transfer_done_cb(struct _dma_resource *resource)
         current_buf = samp_buf_b;
     else
         current_buf = samp_buf_a;
+
+//    current_buf = current_buf == samp_buf_a ? samp_buf_b : samp_buf_a;
 }
 
 
@@ -74,6 +76,9 @@ void adc_init(const void * const adc, mem_adc_cal_t *cal)
     // NOTE
     // part of descriptor 0's setup is completed by _dma_init() using
     // the parameters configured in START.
+    //
+    // the ORDER of these calls matter immensely because of the
+    // non-orthogonality of the API.
     // 
 
     // dmac descriptor 0, channel 0
@@ -81,13 +86,14 @@ void adc_init(const void * const adc, mem_adc_cal_t *cal)
     _dma_set_destination_address(0, samp_buf_a);
     _dma_set_data_amount(0, ADC_BUFLEN);
 
+    // since channel 1's descriptor hasn't been setup in _dma_init()
+    _descriptor_section[1].BTCTRL = _descriptor_section[0].BTCTRL;
+
     // dmac descriptor 1, channel 0 (a.k.a. desc0 ch1)
     _dma_set_source_address(1, (const void *)&REG_ADC0_RESULT);
     _dma_set_destination_address(1, samp_buf_b);
     _dma_set_data_amount(1, ADC_BUFLEN);
 
-    // since channel 1's descriptor hasn't been setup in _dma_init()
-    _descriptor_section[1].BTCTRL = _descriptor_section[0].BTCTRL;
 
 
     // now circularly link the descriptors (the dumb way, the ASF way)
@@ -108,13 +114,20 @@ void adc_init(const void * const adc, mem_adc_cal_t *cal)
 
     // now setup adc0
 
+    // enable channel 0
+    _adc_dma_enable_channel(&ADC_0, 0);
+
     // write the calibration values
     hri_adc_write_CALIB_BIASCOMP_bf(adc, cal->biascomp);
     hri_adc_write_CALIB_BIASREFBUF_bf(adc, cal->biasrefbuf);
     hri_adc_write_CALIB_BIASR2R_bf(adc, cal->biasr2r);
 
     _adc_dma_set_conversion_mode(&ADC_0, ADC_CONVERSION_MODE_FREERUN);
-    _adc_dma_enable_channel(&ADC_0, 0);
+
+    // XXX
+    // for some reason when changing to freerun mode, the ADC needs
+    // time to settle before we kick off the first conversion.
+    delay_ms(10);
     _adc_dma_convert(&ADC_0);
 }
 
