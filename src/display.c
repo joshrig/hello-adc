@@ -157,7 +157,7 @@ void display_write_string(const char *str, uint32_t x, uint32_t y)
         uint8_t topbuf[8], botbuf[8];
         int index = str[i] - 32;
 
-        if (str[i] == '\n')
+        if (str[i] == '\r\n')
         {
             y++;
             x = 1;
