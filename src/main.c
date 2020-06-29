@@ -19,7 +19,6 @@ extern double light_sensor_volts;
 
 
 static bool update_display = true;
-static bool update_serial = true;
 
 
 int main(void)
@@ -84,9 +83,7 @@ int main(void)
     // configure the ADC
     //
     printf("Starting ADC: ");
-
     adc_init(ADC0, &adc_cal);
-
     printf("done.\r\n");
 
 
@@ -134,11 +131,7 @@ int main(void)
             }
 
         }
-        if (update_serial)
-        {
-            update_serial = false;
-            // adc_print_status();
-        }            
+
         uart_do_shell();
         
         __WFI();
@@ -148,16 +141,7 @@ int main(void)
 
 void SysTick_Handler(void)
 {
-    static int j = 0;
-
-
     update_display = true;
-
-    if (j++ > 67)
-    {
-        update_serial = true;
-        j = 0;
-    }
 }
 
 
