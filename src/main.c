@@ -30,20 +30,20 @@ int main(void)
 
     uart_init();
 
-    printf("\nJTOS v0.1 copyright 2020 Codeposse Consulting, Inc.\n");
-    printf("SAME54 serial: %s\n", mem_get_chip_serial());
-    printf("system initializing.\n\n");
+    printf("\r\nJTOS v0.1 copyright 2020 Codeposse Consulting, Inc.\r\n");
+    printf("SAME54 serial: %s\r\n", mem_get_chip_serial());
+    printf("system initializing.\r\n\r\n");
 
     extern uint32_t _sstack;
     extern uint32_t _estack;
-    printf("_sstack: 0x%08X\n", (void *)&_sstack);
-    printf("_estack: 0x%08X\n\n", (void *)&_estack);
+    printf("_sstack: 0x%08X\r\n", (void *)&_sstack);
+    printf("_estack: 0x%08X\r\n\r\n", (void *)&_estack);
 
     supc_init();
 
 
     led_init(kLEDCountMode);
-    printf("initialized LEDs: %s\n", led_get_mode_string());
+    printf("initialized LEDs: %s\r\n", led_get_mode_string());
 
 
     // configure the display
@@ -53,31 +53,31 @@ int main(void)
         GPIO(GPIO_PORTC,  1), // data/command select
         GPIO(GPIO_PORTC, 14)  // spi slave select
         );
-    printf("initialized OLED display\n");
+    printf("initialized OLED display\r\n");
 
     display_clear();
 
 
-    printf("get TSENS calibration params.\n");
+    printf("get TSENS calibration params.\r\n");
 
     mem_tsens_cal_t tsens_cal;
     mem_get_tsens_cal(&tsens_cal);
     
-    printf(" TLI: %d, TLD: %d\n", tsens_cal.tli, tsens_cal.tld);
-    printf(" THI: %d, THD: %d\n", tsens_cal.thi, tsens_cal.thd);
-    printf("  for TL: %0.2f TH: %0.2f\n", tsens_cal.tl, tsens_cal.th);
-    printf(" VPL: %d, VPH: %d\n", tsens_cal.vpl, tsens_cal.vph);
-    printf(" VCL: %d, VCH: %d\n\n", tsens_cal.vcl, tsens_cal.vch);
+    printf(" TLI: %d, TLD: %d\r\n", tsens_cal.tli, tsens_cal.tld);
+    printf(" THI: %d, THD: %d\r\n", tsens_cal.thi, tsens_cal.thd);
+    printf("  for TL: %0.2f TH: %0.2f\r\n", tsens_cal.tl, tsens_cal.th);
+    printf(" VPL: %d, VPH: %d\r\n", tsens_cal.vpl, tsens_cal.vph);
+    printf(" VCL: %d, VCH: %d\r\n\r\n", tsens_cal.vcl, tsens_cal.vch);
     
     
-    printf("get ADC calibration params.\n");
+    printf("get ADC calibration params.\r\n");
 
     mem_adc_cal_t adc_cal;
     mem_get_adc_cal(&adc_cal);
 
-    printf(" BIASCOMP: 0x%01X\n", adc_cal.biascomp);
-    printf(" BIASREFBUF: 0x%01X\n", adc_cal.biasrefbuf);
-    printf(" BIASR2R: 0x%01X\n\n", adc_cal.biasr2r);
+    printf(" BIASCOMP: 0x%01X\r\n", adc_cal.biascomp);
+    printf(" BIASREFBUF: 0x%01X\r\n", adc_cal.biasrefbuf);
+    printf(" BIASR2R: 0x%01X\r\n\r\n", adc_cal.biasr2r);
 
 
     //
@@ -87,7 +87,7 @@ int main(void)
 
     adc_init(ADC0, &adc_cal);
 
-    printf("done.\n");
+    printf("done.\r\n");
 
 
     //
@@ -95,11 +95,16 @@ int main(void)
     //
     uint32_t systick_interval_ticks = 360000;
     SysTick_Config(systick_interval_ticks);
-    printf("SysTick interval: %0.3fs\n\n", (double)systick_interval_ticks / (double)CONF_CPU_FREQUENCY);
+    printf("SysTick interval: %0.3fs\r\n\r\n", (double)systick_interval_ticks / (double)CONF_CPU_FREQUENCY);
 
 
-    printf("system up.\n\n");
+    printf("system up.\r\n\r\n");
     fflush(stdout);
+
+
+
+    uart_start_shell();
+
 
     
     while (1)
@@ -132,9 +137,9 @@ int main(void)
         if (update_serial)
         {
             update_serial = false;
-            adc_print_status();
+            // adc_print_status();
         }            
-
+        uart_do_shell();
         
         __WFI();
     }

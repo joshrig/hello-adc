@@ -128,22 +128,22 @@ void adc_init(const void * const adc, mem_adc_cal_t *cal)
 
 void adc_print_status(void)
 {
-    // printf("dmac enable: %d\n", hri_dmac_get_CTRL_DMAENABLE_bit(ADC0));
-    // printf("dmac ch0 enable: %d\n", hri_dmacchannel_get_CHCTRLA_ENABLE_bit(&DMAC->Channel[0]));
-    // printf("dmac ch1 enable: %d\n", hri_dmacchannel_get_CHCTRLA_ENABLE_bit(&DMAC->Channel[1]));
+    // printf("dmac enable: %d\r\n", hri_dmac_get_CTRL_DMAENABLE_bit(ADC0));
+    // printf("dmac ch0 enable: %d\r\n", hri_dmacchannel_get_CHCTRLA_ENABLE_bit(&DMAC->Channel[0]));
+    // printf("dmac ch1 enable: %d\r\n", hri_dmacchannel_get_CHCTRLA_ENABLE_bit(&DMAC->Channel[1]));
 
-    // printf("desc0 valid: %d\n", hri_dmacdescriptor_get_BTCTRL_VALID_bit(&_descriptor_section[0]));
-    // printf("desc1 valid: %d\n", hri_dmacdescriptor_get_BTCTRL_VALID_bit(&_descriptor_section[1]));
-    // printf("desc0 @ 0x%08X\n", (void *)&_descriptor_section[0]);
-    // printf("desc1 @ 0x%08X\n", (void *)&_descriptor_section[1]);
-    // printf("desc0 descaddr: 0x%08X\n", hri_dmacdescriptor_get_DESCADDR_reg(&_descriptor_section[0], 0xFFFFFFFF));
-    // printf("desc1 descaddr: 0x%08X\n", hri_dmacdescriptor_get_DESCADDR_reg(&_descriptor_section[1], 0xFFFFFFFF));
+    // printf("desc0 valid: %d\r\n", hri_dmacdescriptor_get_BTCTRL_VALID_bit(&_descriptor_section[0]));
+    // printf("desc1 valid: %d\r\n", hri_dmacdescriptor_get_BTCTRL_VALID_bit(&_descriptor_section[1]));
+    // printf("desc0 @ 0x%08X\r\n", (void *)&_descriptor_section[0]);
+    // printf("desc1 @ 0x%08X\r\n", (void *)&_descriptor_section[1]);
+    // printf("desc0 descaddr: 0x%08X\r\n", hri_dmacdescriptor_get_DESCADDR_reg(&_descriptor_section[0], 0xFFFFFFFF));
+    // printf("desc1 descaddr: 0x%08X\r\n", hri_dmacdescriptor_get_DESCADDR_reg(&_descriptor_section[1], 0xFFFFFFFF));
 
-    // printf("samp_buf_a @ 0x%08X\n", (void *)samp_buf_a);
-    // printf("samp_buf_b @ 0x%08X\n", (void *)samp_buf_b);
-    // printf("desc0 dstaddr: 0x%08X\n", hri_dmacdescriptor_get_DSTADDR_reg(&_descriptor_section[0], 0xFFFFFFFF));
-    // printf("desc1 dstaddr: 0x%08X\n", hri_dmacdescriptor_get_DSTADDR_reg(&_descriptor_section[1], 0xFFFFFFFF));
-    printf("%0.3fV\n", light_sensor_volts);
+    // printf("samp_buf_a @ 0x%08X\r\n", (void *)samp_buf_a);
+    // printf("samp_buf_b @ 0x%08X\r\n", (void *)samp_buf_b);
+    // printf("desc0 dstaddr: 0x%08X\r\n", hri_dmacdescriptor_get_DSTADDR_reg(&_descriptor_section[0], 0xFFFFFFFF));
+    // printf("desc1 dstaddr: 0x%08X\r\n", hri_dmacdescriptor_get_DSTADDR_reg(&_descriptor_section[1], 0xFFFFFFFF));
+    printf("%0.3fV\r\n", light_sensor_volts);
 
-    // printf("\n\n");
+    // printf("\r\n\r\n");
 }

@@ -19,5 +19,5 @@ void supc_init(void)
     hri_supc_set_VREF_VREFOE_bit(SUPC);
     printf("VREF ");
 
-    printf("done.\n");
+    printf("done.\r\n");
 }

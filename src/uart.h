@@ -2,7 +2,7 @@
 #define _UART_H
 
 void uart_init(void);
-
-void uart_write(const char *);
+void uart_start_shell(void);
+void uart_do_shell(void);
 
 #endif
