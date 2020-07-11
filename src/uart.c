@@ -5,13 +5,14 @@
 
 #include <atmel_start.h>
 
-#include "adc.h"
-
 #include "uart.h"
 
 
 
 #define RX_BUFLEN 256
+
+#define CMD_HISTLEN 4
+#define CMD_HISTMASK 0x03
 
 
 
@@ -30,6 +31,10 @@ typedef struct
     uint8_t                        cmd_buf[RX_BUFLEN];
     uint8_t                        cmd_wc;
 
+    // history buffer
+    uint8_t                        hist[CMD_HISTLEN][RX_BUFLEN];
+    uint8_t                        hist_wc;
+
     // counters
     uint32_t                       nerr;
     uint32_t                       ntx;
@@ -40,6 +45,7 @@ typedef struct
 
 
 static void execute_command(const char *);
+static void add_to_history(const char *);
 
 
 
@@ -96,6 +102,10 @@ void uart_init(void)
     me->ntx       = 0;
     me->nrx       = 0;
     me->ntx_retry = 0;
+
+    for (int i = 0; i < CMD_HISTLEN; i++)
+        me->hist[i][0] = '\0';
+    me->hist_wc = 0;
 }
 
 
@@ -124,18 +134,20 @@ void uart_do_shell(void)
 
         // shorthand
         char c  = me->cmd_buf[me->cmd_wc];
-        char *p = (char *)&me->cmd_buf[me->cmd_wc];
 
 
         // check for carriage return
         if (c == '\r')
         {
-            *p = '\0';
+            me->cmd_buf[me->cmd_wc] = '\0';
 
             printf("\r\n");
 
             if (strlen((const char *)me->cmd_buf) > 0)
+            {
+                add_to_history((const char *)me->cmd_buf);
                 execute_command((const char *)me->cmd_buf);
+            }
 
             RESET_CMDBUF();
         }
@@ -156,8 +168,25 @@ void uart_do_shell(void)
             printf("\r\n");
             RESET_CMDBUF();
         }
+        else if (c == 0x10)
+        {
+            // ctrl-p
+            
+            // clear line
+            while (me->cmd_wc--)
+                printf("\b \b");
+
+            // copy from the history buffer to the command buffer
+            me->hist_wc--;
+            me->cmd_buf[0] = '\0';
+            strcpy(me->cmd_buf, me->hist[me->hist_wc & CMD_HISTMASK]);
+            me->cmd_wc = strlen(me->cmd_buf);
+            
+            printf("%s", me->cmd_buf);
+        }
         else if (c < 0x20)
         {
+            printf("[0x%X] ", c);
             ;//NOP
         }
         else
@@ -179,12 +208,15 @@ void uart_print_stats(void)
     uart_state_t *me = &uart_state;
 
     printf("USART:\r\n");
-    printf(" me->nerr:      %d\r\n", me->nerr);
-    printf(" me->ntx:       %d\r\n", me->ntx);
-    printf(" me->nrx:       %d\r\n", me->nrx);
-    printf(" me->ntx_retry: %d\r\n", me->ntx_retry);
+    printf(" me->nerr:      %ld\r\n", me->nerr);
+    printf(" me->ntx:       %ld\r\n", me->ntx);
+    printf(" me->nrx:       %ld\r\n", me->nrx);
+    printf(" me->ntx_retry: %ld\r\n", me->ntx_retry);
     printf(" me->rx_wc:     %d\r\n", me->rx_wc);
     printf(" me->rx_rc:     %d\r\n", me->rx_rc);
+    printf(" me->hist_wc:   %d\r\n", me->hist_wc & CMD_HISTMASK);
+    for (int i = 0; i < CMD_HISTLEN; i++)
+        printf("  %d: [%s] %s\r\n", i, me->hist[i], i == (me->hist_wc & CMD_HISTMASK) ? "*" : "");
 }
 
 
@@ -236,6 +268,15 @@ int _read(int file, char *ptr, int len)
 }
 
 
+static void add_to_history(const char *cmd)
+{
+    uart_state_t *me = &uart_state;
+
+    strncpy(me->hist[me->hist_wc & CMD_HISTMASK], cmd, RX_BUFLEN);
+    me->hist_wc++;
+}
+
+
 static void execute_command(const char *cmd)
 {
     char *pch;
@@ -252,6 +293,7 @@ static void execute_command(const char *cmd)
     {
         printf("commands:\r\n");
         printf("?                         help\r\n");
+        printf("^p                        cycle through command history ring buf\r\n");
         printf("s[tats]                   print various module's statistics\r\n");
         printf("w[ord] [0xaddr] [len]     print len words starting at 'addr'\r\n");
         printf("h[alf] [0xaddr] [len]     print len half-words starting at 'addr'\r\n");
@@ -310,6 +352,7 @@ static void execute_command(const char *cmd)
     else if (*pch == 's')
     {
         uart_print_stats();
+        extern void adc_print_stats();
         adc_print_stats();
     }
     else
